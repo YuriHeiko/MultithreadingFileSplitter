@@ -1,0 +1,28 @@
+<h4>FILE SPLITTER</h4>
+
+**Task**  
+You have to create an application for splitting a big file into parts. Splitting should use several threads. You should 
+foresee using the app algorithm for restoring the file back.
+
+**The description of app work**  
+After running, a user inputs a command to start splitting - _split_, the path to the file, and a desirable size of 
+one chunk. The app shows the work progress (in total and by each thread) using next format:  
+    
+    Total progress: 40%, thread 1: 0%, thread 2: 80%, time remaining: 20c
+
+Progress information should be indicated each second. By the end of the process, the app prompts user to input next 
+commands. A user should enter _exit_ in order to exit.
+
+**Incoming parameters**  
+
+<ul>
+    <li>split - breaks file into parts</li>
+    <li>split -p /home/user/file.avi -s 20M</li>
+    <li>
+        <ul>
+            <li>p - the file path</li>
+            <li>-s - the size of a chunk</li>
+        </ul>
+    </li>
+    <li>exit - stops program executing</li>
+</ul>
