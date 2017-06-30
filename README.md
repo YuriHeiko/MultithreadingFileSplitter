@@ -13,16 +13,10 @@ one chunk. The app shows the work progress (in total and by each thread) using n
 Progress information should be indicated each second. By the end of the process, the app prompts user to input next 
 commands. A user should enter _exit_ in order to exit.
 
-**Incoming parameters**  
+**Commands**  
 
-<ul>
-    <li>split - breaks file into parts</li>
-    <li>split -p /home/user/file.avi -s 20M</li>
-    <li>
-        <ul>
-            <li>p - the file path</li>
-            <li>-s - the size of a chunk</li>
-        </ul>
-    </li>
-    <li>exit - stops program executing</li>
-</ul>
+    split - breaks file into parts
+    split -p /home/user/file.avi -s 20M
+        -p - the file path
+        -s - the size of a chunk
+    exit - stops program executing
