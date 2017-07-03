@@ -11,7 +11,7 @@ one chunk. The app shows the work progress (in total and by each thread) using n
     Total progress: 40%, thread 1: 0%, thread 2: 80%, time remaining: 20c
 
 Progress information should be indicated each second. By the end of the process, the app prompts user to input next 
-commands. A user should enter _exit_ in order to exit.
+commands. A user can type _exit_ in order to exit.
 
 **Commands**  
 
