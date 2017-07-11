@@ -6,7 +6,7 @@ foresee using the app algorithm for restoring the file back.
 
 **The description of app work**  
 After running, a user inputs a command to start splitting - _split_, the path to the file, and a desirable size of 
-one chunk. The app shows the work progress (in total and by each thread) using next format:  
+a chunk. The app shows the work progress (in total and by each thread) using next format:  
     
     Total progress: 40%, thread 1: 0%, thread 2: 80%, time remaining: 20c
 
