@@ -1,4 +1,4 @@
-package com.sysgears.processor.factory;
+package com.sysgears.processor.threads;
 
 public interface Processor {
     void create();

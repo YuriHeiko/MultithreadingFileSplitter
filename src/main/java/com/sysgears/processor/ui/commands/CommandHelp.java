@@ -6,8 +6,8 @@ import com.beust.jcommander.Parameters;
 @Parameters(commandNames = "help", commandDescription = "Help")
 public class CommandHelp implements Executor {
     @Override
-    public boolean execute(JCommander jCommander) {
+    public String execute(JCommander jCommander) {
         jCommander.usage();
-        return true;
+        return "help";
     }
 }

@@ -6,7 +6,7 @@ import com.beust.jcommander.Parameters;
 @Parameters(commandNames = "exit", commandDescription = "To exit from program")
 public class CommandExit implements Executor {
     @Override
-    public boolean execute(JCommander jCommander) {
-        return false;
+    public String execute(JCommander jCommander) {
+        return "exit";
     }
 }
