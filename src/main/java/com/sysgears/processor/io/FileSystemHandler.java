@@ -5,36 +5,35 @@ import java.io.RandomAccessFile;
 public enum FileSystemHandler implements IOHandler {
     SPLITTER {
         @Override
-        public int write(byte[] buffer, long position) {
-            return 0;
+        public void write(final RandomAccessFile raf, final int buffer, final long position, final int chunkNumber) {
         }
 
         @Override
-        public byte[] read(long position) {
-            return new byte[0];
+        public int read(final RandomAccessFile raf, final long position, final int chunkNumber) {
+            synchronized (raf) {
+                return 0;
+            }
         }
     },
     JOINER {
         @Override
-        public int write(byte[] buffer, long position) {
-            return 0;
+        public void write(final RandomAccessFile raf, final int buffer, final long position, final int chunkNumber) {
+
+            synchronized (raf) {
+                super.write0(raf, buffer, position, chunkNumber);
+            }
         }
 
         @Override
-        public byte[] read(long position) {
-
-            return new byte[0];
+        public int read(final RandomAccessFile raf, final long position, final int chunkNumber) {
+            return 0;
         }
     };
 
-    private RandomAccessFile raf;
-    private final byte[] buffer = new byte[2048];
-
-    public void setRaf(RandomAccessFile raf) {
-        this.raf = raf;
+    private void write0(final RandomAccessFile raf, final int buffer, final long position, final int chunkNumber) {
     }
 
-    private RandomAccessFile getRaf() {
-        return raf;
+    private int read0(final RandomAccessFile raf, final long position, final int chunkNumber) {
+        return 0;
     }
 }

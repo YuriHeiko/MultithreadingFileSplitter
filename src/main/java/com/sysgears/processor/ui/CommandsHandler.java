@@ -1,7 +1,8 @@
-package com.sysgears.processor.ui.commands;
+package com.sysgears.processor.ui;
 
 import com.beust.jcommander.JCommander;
 import com.sysgears.processor.io.IOHandler;
+import com.sysgears.processor.ui.commands.*;
 
 /**
  * Handles User's commands

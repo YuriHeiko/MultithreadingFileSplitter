@@ -3,7 +3,6 @@ package com.sysgears.processor.ui;
 import com.beust.jcommander.ParameterException;
 import com.sysgears.processor.exceptions.FileProcessorException;
 import com.sysgears.processor.io.IOHandler;
-import com.sysgears.processor.ui.commands.CommandsHandler;
 
 import java.io.*;
 
@@ -11,6 +10,7 @@ public class FileProcessor {
     private InputStream systemIS;
     private OutputStream systemOS;
     private IOHandler io;
+    public static final String partPrefix = ".part";
 
     public FileProcessor(IOHandler io) {
         this.io = io;
@@ -37,6 +37,7 @@ public class FileProcessor {
                     command = handler.handle(reader.readLine().split(" "));
 
                 } catch (ParameterException e) {
+                    System.out.println(e.getMessage());
                     System.out.println("You've entered the wrong command. Try again or type 'help':");
 
                 } catch (FileProcessorException e) {

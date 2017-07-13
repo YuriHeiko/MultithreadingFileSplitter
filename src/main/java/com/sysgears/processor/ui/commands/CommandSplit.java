@@ -3,8 +3,16 @@ package com.sysgears.processor.ui.commands;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import com.sysgears.processor.exceptions.FileProcessorException;
 import com.sysgears.processor.io.IOHandler;
+import com.sysgears.processor.statistic.StatisticHolder;
+import com.sysgears.processor.threads.Processor;
+import com.sysgears.processor.threads.SplitProcessor;
+import com.sysgears.processor.ui.Executor;
+import com.sysgears.processor.exceptions.UIException;
+import com.sysgears.processor.ui.FileProcessor;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Parameters(commandNames = "split", commandDescription = "Break file into parts")
 public class CommandSplit implements Executor {
@@ -17,7 +25,9 @@ public class CommandSplit implements Executor {
     @Parameter(names = "-t", description = "Number of threads")
     private int threadsNumber = 4;
 
-    private IOHandler io;
+    private final int startNumber = 1;
+
+    private final IOHandler io;
 
     public CommandSplit(IOHandler io) {
         this.io = io;
@@ -28,8 +38,10 @@ public class CommandSplit implements Executor {
     public String execute(JCommander jCommander) {
         long chunkSize = convertSizeToNumber(chunk);
 
+        Processor processor = new SplitProcessor(path, FileProcessor.partPrefix, new StatisticHolder(), startNumber, chunkSize);
+        startWorkers(processor.getWorkers(), threadsNumber);
 
-        return "split";
+        return "done";
     }
 
     long convertSizeToNumber(final String chunk) {
@@ -39,7 +51,7 @@ public class CommandSplit implements Executor {
         try {
             chunkSize = Long.valueOf(split[0]);
         } catch (NumberFormatException e) {
-            throw new FileProcessorException("You've entered the wrong chunk size, it should be a positive number or " +
+            throw new UIException("You've entered the wrong chunk size, it should be a positive number or " +
                     "it can have next format NUMBER[GB|MB|kB] (2GB is MAX number)");
         }
 
@@ -55,7 +67,7 @@ public class CommandSplit implements Executor {
         }
 
         if (chunkSize <= 0 || chunkSize > Integer.MAX_VALUE + 1L) {
-            throw new FileProcessorException("You've entered the wrong chunk size, it must be a positive number " +
+            throw new UIException("You've entered the wrong chunk size, it must be a positive number " +
                     "greater than 0 and it cannot exceed 2GB");
         }
 

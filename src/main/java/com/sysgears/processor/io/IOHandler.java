@@ -1,7 +1,9 @@
 package com.sysgears.processor.io;
 
-public interface IOHandler {
-    int write(byte[] buffer, long position);
+import java.io.RandomAccessFile;
 
-    byte[] read(long position);
+public interface IOHandler {
+    void write(RandomAccessFile raf, int buffer, long position, int chunkNumber);
+
+    int read(RandomAccessFile raf, long position, int chunkNumber);
 }

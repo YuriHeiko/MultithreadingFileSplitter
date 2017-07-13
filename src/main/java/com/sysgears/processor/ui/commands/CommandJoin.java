@@ -4,6 +4,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.sysgears.processor.io.IOHandler;
+import com.sysgears.processor.ui.Executor;
 
 @Parameters(commandNames = "join", commandDescription = "Join parts into file")
 public class CommandJoin implements Executor {
@@ -22,6 +23,6 @@ public class CommandJoin implements Executor {
     @Override
     public String execute(JCommander jCommander) {
         System.out.println("join " + "-p " + path);
-        return "join";
+        return "done";
     }
 }
