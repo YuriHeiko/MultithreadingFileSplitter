@@ -15,7 +15,7 @@ public class StatisticHandler implements Runnable {
             System.out.println(statisticHolder.toString());
 
             try {
-                Thread.sleep(100);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 throw new StatisticHolderException("The statistic thread has been suddenly interrupted!");
             }

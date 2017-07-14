@@ -10,7 +10,10 @@ public class FileProcessor {
     private InputStream systemIS;
     private OutputStream systemOS;
     private IOHandler io;
-    public static final String partPrefix = ".part";
+
+    public final static int bufferSize = 1024;
+
+    public final static String partPrefix = ".part";
 
     public FileProcessor(IOHandler io) {
         this.io = io;

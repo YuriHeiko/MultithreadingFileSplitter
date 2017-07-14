@@ -27,7 +27,6 @@ public class StatisticHolder {
     }
 
     public void setWorkerDone(final Thread thread, final long done) {
-
         map.get(thread.getId()).done += done;
 
         totalDone.addAndGet(done);

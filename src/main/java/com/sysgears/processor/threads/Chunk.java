@@ -12,7 +12,7 @@ abstract class Chunk implements Runnable {
     private final IOHandler io;
     private RandomAccessFile rafRead;
     private RandomAccessFile rafWrite;
-    private final StatisticHolder holder;
+    final StatisticHolder holder;
     final long pointer;
     final long chunkSize;
 
@@ -52,5 +52,4 @@ abstract class Chunk implements Runnable {
             e.printStackTrace();
         }
     }
-
 }
