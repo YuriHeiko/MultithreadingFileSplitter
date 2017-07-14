@@ -33,7 +33,7 @@ public class JoinProcessor extends Processor {
         public void run() {
             int counter = 0;
             while (counter < chunkSize) {
-                doAction(counter, chunkNumber * chunkSize + counter, ++counter);
+//                doAction(counter, chunkNumber * chunkSize + counter, ++counter);
             }
         }
     }

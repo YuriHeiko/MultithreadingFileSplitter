@@ -38,7 +38,18 @@ public class CommandSplit implements Executor {
     public String execute(JCommander jCommander) {
         long chunkSize = convertSizeToNumber(chunk);
 
-        Processor processor = new SplitProcessor(path, FileProcessor.partPrefix, new StatisticHolder(), startNumber, chunkSize);
+        StatisticHolder holder = new StatisticHolder();
+        holder.timerStart();
+
+/*
+        try {
+            Thread.sleep(10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+*/
+
+        Processor processor = new SplitProcessor(path, FileProcessor.partPrefix, holder, startNumber, chunkSize);
         startWorkers(processor.getWorkers(), threadsNumber);
 
         return "done";

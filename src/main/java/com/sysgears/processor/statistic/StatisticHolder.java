@@ -23,7 +23,7 @@ public class StatisticHolder {
         if (startTime == 0) {
             throw new StatisticHolderException("The timer has not been started.");
         }
-
+//        System.out.println(thread.getId() + "| total: " + total + " | done: " + done);
         Statistic statistic = map.get(thread.getId());
 
         if (statistic != null) {
@@ -47,19 +47,23 @@ public class StatisticHolder {
     }
 
     boolean isJobDone() {
-        if (totalToBeDone < totalDone.get()) {
-            throw new StatisticHolderException("Done work exceeded set bound.");
+        if ((totalToBeDone + 1)  < totalDone.get()) {
+            throw new StatisticHolderException("Done work exceeded set bound." + " totalToBeDone: " + totalToBeDone +
+                    " totalDone:" + totalDone);
         }
 
-        return totalToBeDone == totalDone.get();
+        return (totalToBeDone +1) == totalDone.get();
     }
 
     String getPercent(final long total, final long done) {
-        return String.valueOf((done * 10000 / total) / 100.0);
+        long t = (total == 0 ? 1 : total);
+
+        return String.valueOf((done * 10000 / t) / 100.0);
     }
 
     String timeRemaining() {
-        return String.valueOf((totalToBeDone * (System.currentTimeMillis() - startTime) / totalDone.get()) / 1000);
+        long timeSpent = System.currentTimeMillis() - startTime;
+        return String.valueOf((totalToBeDone * timeSpent / totalDone.get() - timeSpent) / 1000);
     }
 
     @Override

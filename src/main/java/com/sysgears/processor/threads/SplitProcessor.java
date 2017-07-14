@@ -19,31 +19,46 @@ public class SplitProcessor extends Processor {
     @Override
     public Collection<Runnable> getWorkers() {
         long fileSize = getFileSize();
+        holder.setTotalToBeDone(fileSize);
+
         int chunksNumber = (int) (fileSize / chunkSize) + (fileSize % chunkSize > 0 ? 1 : 0);
 
         List<Runnable> workers = new ArrayList<>(chunksNumber);
-        for (int i = 0; i < chunksNumber; i++) {
-            workers.add(new SplitChunk(FileSystemHandler.SPLITTER, holder, getNextChunkName(), getParentFileName(), i,
-                    chunkSize));
-        }
+        long size = chunkSize;
 
-        holder.setTotalToBeDone(fileSize);
-        holder.timerStart();
+        for (int i = 0; i < chunksNumber; i++) {
+            workers.add(new SplitChunk(FileSystemHandler.SPLITTER, holder, getNextChunkName(), getParentFileName(),
+                    i * chunkSize, size));
+
+            fileSize -= chunkSize;
+            if (fileSize < size) {
+                size = fileSize;
+            }
+        }
 
         return workers;
     }
 
     class SplitChunk extends Chunk {
-        public SplitChunk(IOHandler io, StatisticHolder holder, String fileToWriteName, String fileToReadName, int chunkNumber, long chunkSize) {
-            super(io, holder, fileToWriteName, fileToReadName, chunkNumber, chunkSize);
+        public SplitChunk(final IOHandler io, final StatisticHolder holder, final String fileToWriteName,
+                          final String fileToReadName, final long pointer, final long chunkSize) {
+            super(io, holder, fileToWriteName, fileToReadName, pointer, chunkSize);
         }
 
         @Override
         public void run() {
-            int counter = 0;
-            while (counter < chunkSize) {
-                doAction(chunkNumber * chunkSize + counter, counter, ++counter);
+            int buffSize = chunkSize < 1024 ? 1 : 1024;
+            long toDo = chunkSize;
+
+            while (toDo > 0) {
+                doAction(pointer + chunkSize - toDo, chunkSize - toDo, buffSize);
+                toDo -= buffSize;
+                if (toDo < buffSize && toDo > 0) {
+                    buffSize = (int) toDo;
+                }
             }
+
+            close();
         }
     }
 }
