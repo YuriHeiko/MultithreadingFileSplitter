@@ -43,6 +43,10 @@ public class FileProcessor {
                 } catch (FileProcessorException e) {
                     System.out.println(e.getMessage());
                 }
+
+                // Have to create a new instance every time due to a JCommander 'feature'
+                // https://github.com/cbeust/jcommander/issues/271
+                handler = new CommandsHandler(io);
             }
 
         } catch (Exception e) {

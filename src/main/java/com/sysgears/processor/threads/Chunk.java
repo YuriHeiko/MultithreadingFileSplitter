@@ -33,12 +33,14 @@ abstract class Chunk implements Runnable {
         }
     }
 
-    void doAction(final long readPointer, final long writePointer, final int buffSize) {
+    int doAction(final long readPointer, final long writePointer, final int buffSize) {
         byte[] buffer = new byte[buffSize];
         int read = io.read(rafRead, buffer, readPointer);
-        io.write(rafWrite, buffer, writePointer);
-        // TODO buffer.length isn't right!!!
-        holder.setThreadDone(Thread.currentThread(), chunkSize, read);
+        io.write(rafWrite, buffer, writePointer, read);
+
+        holder.setWorkerDone(Thread.currentThread(), read);
+
+        return read;
     }
 
     void close() {

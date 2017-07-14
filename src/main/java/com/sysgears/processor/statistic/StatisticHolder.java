@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class StatisticHolder {
     private final Map<Long, Statistic> map = new ConcurrentSkipListMap<>();
     private long totalToBeDone;
-    private AtomicLong totalDone = new AtomicLong(1);
+    private AtomicLong totalDone = new AtomicLong(0);
     private long startTime;
 
     public StatisticHolder() {
@@ -19,51 +19,56 @@ public class StatisticHolder {
         this.totalToBeDone = totalToBeDone;
     }
 
-    public void setThreadDone(final Thread thread, final long total, final long done) {
-        if (startTime == 0) {
-            throw new StatisticHolderException("The timer has not been started.");
+    public void addNewWorker(final Thread thread, final long total) {
+        Statistic worker = new Statistic(total, 0);
+        if (map.replace(thread.getId(), worker) == null) {
+            map.put(thread.getId(), worker);
         }
-//        System.out.println(thread.getId() + "| total: " + total + " | done: " + done);
-        Statistic statistic = map.get(thread.getId());
+    }
 
-        if (statistic != null) {
-            statistic.total = total;
-            statistic.done = done;
+    public void setWorkerDone(final Thread thread, final long done) {
 
-        } else {
-            map.put(thread.getId(), new Statistic(total, done));
-        }
+        map.get(thread.getId()).done += done;
 
         totalDone.addAndGet(done);
     }
 
-    public void timerStart() {
+    public Thread startWatching() {
         if (startTime > 0) {
             throw new StatisticHolderException("An attempt to restart already started timer.");
         }
 
         startTime = System.currentTimeMillis();
-        new Thread(new StatisticHandler(this)).start();
+        Thread statisticHandler = new Thread(new StatisticHandler(this));
+        statisticHandler.start();
+
+        return statisticHandler;
     }
 
     boolean isJobDone() {
-        if ((totalToBeDone + 1)  < totalDone.get()) {
+        if (totalToBeDone < totalDone.get()) {
             throw new StatisticHolderException("Done work exceeded set bound." + " totalToBeDone: " + totalToBeDone +
                     " totalDone:" + totalDone);
         }
 
-        return (totalToBeDone +1) == totalDone.get();
+        return totalToBeDone == totalDone.get();
     }
 
     String getPercent(final long total, final long done) {
         long t = (total == 0 ? 1 : total);
 
-        return String.valueOf((done * 10000 / t) / 100.0);
+        return String.format("%.2f", done * 100.0 / t);
     }
 
-    String timeRemaining() {
-        long timeSpent = System.currentTimeMillis() - startTime;
-        return String.valueOf((totalToBeDone * timeSpent / totalDone.get() - timeSpent) / 1000);
+    private String timeRemaining() {
+        String result = "estimating";
+
+        if (totalDone.get() != 0) {
+            long timeSpent = System.currentTimeMillis() - startTime;
+            result = String.valueOf((totalToBeDone * timeSpent / totalDone.get() - timeSpent) / 1000) + "s";
+        }
+
+        return result;
     }
 
     @Override
@@ -73,10 +78,11 @@ public class StatisticHolder {
 
         int counter = 0;
         for (Map.Entry<Long, Statistic> entry : map.entrySet()) {
-            builder.append(", thread ").append(++counter).append(": ").append(entry.getValue().getPercentDone());
+            builder.append("\t thread ").append(++counter).
+                    append(": ").append(entry.getValue().getPercentDone()).append("%");
         }
 
-        return builder.append(", time remaining: ").append(timeRemaining()).append("s").toString();
+        return builder.append("\t time remaining: ").append(timeRemaining()).toString();
     }
 
     private class Statistic {

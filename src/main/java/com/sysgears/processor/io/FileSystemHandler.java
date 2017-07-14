@@ -8,8 +8,8 @@ import java.io.RandomAccessFile;
 public enum FileSystemHandler implements IOHandler {
     SPLITTER {
         @Override
-        public void write(final RandomAccessFile raf, final byte[] buffer, final long position) {
-            super.write0(raf, buffer, position);
+        public void write(final RandomAccessFile raf, final byte[] buffer, final long position, final int length) {
+            super.write0(raf, buffer, position, length);
         }
 
         @Override
@@ -21,10 +21,10 @@ public enum FileSystemHandler implements IOHandler {
     },
     JOINER {
         @Override
-        public void write(final RandomAccessFile raf, final byte[] buffer, final long position) {
+        public void write(final RandomAccessFile raf, final byte[] buffer, final long position, final int length) {
 
             synchronized (raf) {
-                super.write0(raf, buffer, position);
+                super.write0(raf, buffer, position, length);
             }
         }
 
@@ -35,10 +35,10 @@ public enum FileSystemHandler implements IOHandler {
     };
 
 
-    private void write0(final RandomAccessFile raf, final byte[] buffer, final long position) {
+    private void write0(final RandomAccessFile raf, final byte[] buffer, final long position, final int length) {
         try {
             raf.seek(position);
-            raf.write(buffer);
+            raf.write(buffer, 0, length);
         } catch (IOException e) {
             throw new IOHandlerException("IO error during writing");
         }

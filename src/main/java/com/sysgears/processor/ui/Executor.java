@@ -14,16 +14,15 @@ public interface Executor {
 
     default void startWorkers(final Collection<Runnable> workers, final int threadsNumber) {
         ExecutorService service = Executors.newFixedThreadPool(threadsNumber);
-//        ExecutorService service = Executors.newSingleThreadExecutor();
 
         for (Runnable task : workers) {
             service.submit(task);
         }
+
         service.shutdown();
 
         try {
-            while (service.awaitTermination(1000, TimeUnit.MILLISECONDS));
-            Thread.sleep(1000);
+            service.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             throw new FileProcessorException("Work awaiting was suddenly interrupted.");
         }
