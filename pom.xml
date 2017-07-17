@@ -6,6 +6,7 @@
 
     <groupId>com.sysgears</groupId>
     <artifactId>filesplitter</artifactId>
+    <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
 
 
@@ -21,6 +22,15 @@
             </plugin>
         </plugins>
     </build>
+
+<!--
+    <modules>
+        <module>ui</module>
+        <module>service</module>
+        <module>statistic</module>
+        <module>io</module>
+    </modules>
+-->
 
     <dependencies>
         <dependency>

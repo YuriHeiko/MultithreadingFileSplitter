@@ -1,11 +1,9 @@
 package com.sysgears.processor.io;
 
-import com.sysgears.processor.ui.FileProcessorException;
-
 /**
  * Thrown to indicate that the IO error is arisen
  */
-public class IOHandlerException extends FileProcessorException {
+public class IOHandlerException extends RuntimeException {
     /**
      * Constructs an object. Resend message to the super
      * class constructor

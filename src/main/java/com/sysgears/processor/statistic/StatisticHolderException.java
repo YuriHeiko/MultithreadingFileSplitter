@@ -1,12 +1,10 @@
 package com.sysgears.processor.statistic;
 
-import com.sysgears.processor.ui.FileProcessorException;
-
 /**
  * Thrown to indicate that the error is happened on
  * the statistic layer
  */
-public class StatisticHolderException extends FileProcessorException {
+public class StatisticHolderException extends RuntimeException {
     /**
      * Constructs an object. Resend message to the super
      * class constructor

@@ -2,10 +2,18 @@ package com.sysgears.processor.ui.commands;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameters;
-import com.sysgears.processor.ui.Executable;
 
+/**
+ * A command to quit program
+ */
 @Parameters(commandNames = "exit", commandDescription = "Quit program")
-public class CommandExit implements Executable {
+public class CommandExit extends Command {
+    /**
+     * Shows help
+     *
+     * @param jCommander The {@code JCommander} object
+     * @return The string with the command representation
+     */
     @Override
     public String execute(JCommander jCommander) {
         return "exit";

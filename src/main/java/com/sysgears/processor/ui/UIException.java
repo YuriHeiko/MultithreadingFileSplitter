@@ -3,7 +3,7 @@ package com.sysgears.processor.ui;
 /**
  * Thrown to indicate that the UI error is arisen
  */
-public class UIException extends FileProcessorException {
+public class UIException extends RuntimeException {
     /**
      * Constructs an object. Resend message to the super
      * class constructor

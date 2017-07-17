@@ -4,7 +4,7 @@ import java.io.RandomAccessFile;
 
 /**
  * Asynchronously writes into and synchronously reads from a
- * given file
+ * {@code RandomAccessFile}
  */
 public class SplitterIO extends IOHandler {
     /**

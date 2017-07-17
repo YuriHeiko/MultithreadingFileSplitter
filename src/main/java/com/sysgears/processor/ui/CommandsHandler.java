@@ -1,13 +1,15 @@
 package com.sysgears.processor.ui;
 
 import com.beust.jcommander.JCommander;
-import com.sysgears.processor.io.IOHandler;
 import com.sysgears.processor.ui.commands.*;
 
 /**
  * Handles User's commands
  */
 public class CommandsHandler {
+    /**
+     * The {@code JCommander} object
+     */
     private final JCommander jCommander;
 
     public CommandsHandler() {
@@ -26,7 +28,7 @@ public class CommandsHandler {
     public String handle(final String[] args) {
         jCommander.parse(args);
         JCommander parsedJCommander = jCommander.getCommands().get(jCommander.getParsedCommand());
-        Executable commandObject = (Executable) parsedJCommander.getObjects().get(0);
-        return commandObject.execute(jCommander);
+        Command command = (Command) parsedJCommander.getObjects().get(0);
+        return command.execute(jCommander);
     }
 }

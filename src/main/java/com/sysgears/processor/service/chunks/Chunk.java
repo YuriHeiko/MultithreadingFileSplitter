@@ -3,23 +3,54 @@ package com.sysgears.processor.service.chunks;
 import com.sysgears.processor.io.IOHandler;
 import com.sysgears.processor.service.ServiceException;
 import com.sysgears.processor.statistic.StatisticHolder;
-import com.sysgears.processor.ui.FileProcessor;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- *
+ * Represents a part of a file to do some action with it.
  */
 abstract class Chunk implements Runnable {
+    /**
+     * The {@code IOHandler}
+     */
     private final IOHandler IO;
+    /**
+     * The {@code RandomAccessFile} object to read
+     */
     private final RandomAccessFile RAF_READ;
+    /**
+     * The {@code RandomAccessFile} object to write
+     */
     private final RandomAccessFile RAF_WRITE;
+    /**
+     * The {@code StatisticHolder} object
+     */
     private final StatisticHolder HOLDER;
+    /**
+     * The default size of the buffer to read/write operations
+     */
+    private final static int BUFFER_SIZE = 1024;
+    /**
+     * The file offset pointer
+     */
     final long POINTER;
+    /**
+     * The size of this part
+     */
     final long CHUNK_SIZE;
 
+    /**
+     * Constructs an object
+     *
+     * @param io              The {@code IOHandler}
+     * @param holder          The {@code StatisticHolder}
+     * @param fileToWriteName The file-to-write file name
+     * @param fileToReadName  The file-to-read file name
+     * @param pointer         The file offset pointer
+     * @param chunkSize       The size of this part
+     */
     Chunk(final IOHandler io, final StatisticHolder holder, final String fileToWriteName,
           final String fileToReadName, final long pointer, final long chunkSize) {
 
@@ -31,22 +62,25 @@ abstract class Chunk implements Runnable {
         try {
             RAF_READ = new RandomAccessFile(fileToReadName, "r");
             RAF_WRITE = new RandomAccessFile(fileToWriteName, "rw");
-
         } catch (FileNotFoundException e) {
             throw new ServiceException(fileToReadName + " doesn't exist.");
         }
     }
 
+    /**
+     * Does some action with the part of the file
+     */
     @Override
     public void run() {
-        int buffSize = CHUNK_SIZE < FileProcessor.bufferSize ? (int) CHUNK_SIZE : FileProcessor.bufferSize;
+        int buffSize = CHUNK_SIZE < BUFFER_SIZE ? (int) CHUNK_SIZE : BUFFER_SIZE;
         long total = CHUNK_SIZE;
-        HOLDER.resetThread(Thread.currentThread(), CHUNK_SIZE);
+        HOLDER.resetProgress(Thread.currentThread(), CHUNK_SIZE);
 
         while (total > 0) {
-            int done = doAction(total, buffSize);
+            int done = callAction(total, buffSize);
 
             total -= done;
+            // tackles the last part issue
             if (total < buffSize && total > 0) {
                 buffSize = (int) total;
             }
@@ -61,14 +95,29 @@ abstract class Chunk implements Runnable {
         }
     }
 
-    abstract int doAction(final long total, final int buffSize);
+    /**
+     * Calls an action
+     *
+     * @param total    The number of bytes to process
+     * @param buffSize The size of the buffer
+     * @return The number of processed bytes
+     */
+    abstract int callAction(final long total, final int buffSize);
 
+    /**
+     * Performs an action
+     *
+     * @param readPointer  The file offset to read
+     * @param writePointer The file offset to write
+     * @param buffSize     The size of the buffer
+     * @return The number of processed bytes
+     */
     int doAction(final long readPointer, final long writePointer, final int buffSize) {
         byte[] buffer = new byte[buffSize];
         int read = IO.read(RAF_READ, buffer, readPointer);
         IO.write(RAF_WRITE, buffer, writePointer, read);
 
-        HOLDER.setThreadProgress(Thread.currentThread(), read);
+        HOLDER.setProgress(Thread.currentThread(), read);
 
         return read;
     }

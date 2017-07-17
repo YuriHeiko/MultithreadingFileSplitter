@@ -1,20 +1,42 @@
 package com.sysgears.processor.ui;
 
 import com.beust.jcommander.ParameterException;
+import com.sysgears.processor.io.IOHandlerException;
+import com.sysgears.processor.service.ServiceException;
+import com.sysgears.processor.statistic.StatisticHolderException;
 
 import java.io.*;
 
+/**
+ * Conducts dialogue with a user and performs their commands
+ */
 public class FileProcessor {
+    /**
+     * The saved {@code System.in} object
+     */
     private InputStream systemIS;
+    /**
+     * The saved {@code System.out} object
+     */
     private OutputStream systemOS;
-
-    public final static int bufferSize = 1024;
-
+    /**
+     * The default prefix string of a part name
+     */
     public final static String PART_PREFIX = ".part";
 
-    public FileProcessor() {
-    }
+    /**
+     * Constructs an object with default console Input and
+     * Output streams
+     */
+    public FileProcessor() {}
 
+    /**
+     * Constructs an object with received Input and Output
+     * streams
+     *
+     * @param is The Input stream
+     * @param os The output stream
+     */
     public FileProcessor(InputStream is, OutputStream os) {
         systemIS = System.in;
         systemOS = System.out;
@@ -23,6 +45,9 @@ public class FileProcessor {
         System.setOut(new PrintStream(os));
     }
 
+    /**
+     * Conducts dialogue with a user and performs their commands
+     */
     public void run() {
         String command = "";
         System.out.println("This program can split and join a file using multiple threads" + System.lineSeparator());
@@ -38,8 +63,8 @@ public class FileProcessor {
                     System.out.println(e.getMessage());
                     System.out.println("You've entered the wrong command. Try again or type 'help':");
 
-                } catch (FileProcessorException e) {
-                    System.out.println(e.getMessage());
+                } catch (UIException | StatisticHolderException | ServiceException | IOHandlerException e) {
+                    System.out.println(e.getMessage() + System.lineSeparator());
                 }
 
                 // Have to create a new instance every time due to a JCommander 'feature'

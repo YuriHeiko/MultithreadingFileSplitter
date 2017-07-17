@@ -4,7 +4,7 @@ import java.io.RandomAccessFile;
 
 /**
  * Synchronously writes into and asynchronously reads from a
- * given file
+ * {@code RandomAccessFile}
  */
 public class JoinerIO extends IOHandler {
     /**
