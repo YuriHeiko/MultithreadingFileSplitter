@@ -53,7 +53,7 @@ public class StatisticHolder {
         return totalToBeDone == totalDone.get();
     }
 
-    String getPercent(final long total, final long done) {
+    private String getPercent(final long total, final long done) {
         long t = (total == 0 ? 1 : total);
 
         return String.format("%.2f", done * 100.0 / t);

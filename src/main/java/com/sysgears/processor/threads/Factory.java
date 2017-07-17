@@ -34,5 +34,5 @@ public abstract class Factory {
         return file.exists() && file.isFile();
     }
 
-    public abstract Collection<Runnable> getWorkers();
+    public abstract Collection<Runnable> createChunks();
 }

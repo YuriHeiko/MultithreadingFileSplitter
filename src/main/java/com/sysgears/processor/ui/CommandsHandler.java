@@ -10,11 +10,11 @@ import com.sysgears.processor.ui.commands.*;
 public class CommandsHandler {
     private final JCommander jCommander;
 
-    public CommandsHandler(final IOHandler io) {
+    public CommandsHandler() {
         jCommander = JCommander.newBuilder().addCommand(new CommandExit()).
                                              addCommand(new CommandHelp()).
-                                             addCommand(new CommandJoin(io)).
-                                             addCommand(new CommandSplit(io)).
+                                             addCommand(new CommandJoin()).
+                                             addCommand(new CommandSplit()).
                                              build();
     }
 

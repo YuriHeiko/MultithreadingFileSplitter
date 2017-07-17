@@ -16,7 +16,7 @@ public class JoinFactory extends Factory {
     }
 
     @Override
-    public Collection<Runnable> getWorkers() {
+    public Collection<Runnable> createChunks() {
         long parentFileLength = 0;
         String parentName = fileName.substring(0, fileName.lastIndexOf(partPrefix));
 

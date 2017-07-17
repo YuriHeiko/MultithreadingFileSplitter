@@ -4,7 +4,6 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.sysgears.processor.exceptions.UIException;
-import com.sysgears.processor.io.IOHandler;
 import com.sysgears.processor.statistic.StatisticHolder;
 import com.sysgears.processor.threads.Factory;
 import com.sysgears.processor.threads.SplitFactory;
@@ -38,7 +37,7 @@ public class CommandSplit implements Executable {
         Factory factory = new SplitFactory(path, FileProcessor.partPrefix, holder, startNumber, chunkSize);
         Thread statisticHandler = holder.startWatching();
 
-        startWorkers(factory.getWorkers(), threadsNumber);
+        startWorkers(factory.createChunks(), threadsNumber);
 
         try {
             statisticHandler.join();

@@ -9,20 +9,17 @@ import java.io.*;
 public class FileProcessor {
     private InputStream systemIS;
     private OutputStream systemOS;
-    private IOHandler io;
 
     public final static int bufferSize = 1024;
 
     public final static String partPrefix = ".part";
 
-    public FileProcessor(IOHandler io) {
-        this.io = io;
+    public FileProcessor() {
     }
 
-    public FileProcessor(InputStream is, OutputStream os, IOHandler io) {
+    public FileProcessor(InputStream is, OutputStream os) {
         systemIS = System.in;
         systemOS = System.out;
-        this.io = io;
 
         System.setIn(is);
         System.setOut(new PrintStream(os));
@@ -31,7 +28,7 @@ public class FileProcessor {
     public void run() {
         String command = "";
         System.out.println("This program can split and join a file using multiple threads" + System.lineSeparator());
-        CommandsHandler handler = new CommandsHandler(io);
+        CommandsHandler handler = new CommandsHandler();
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
             while (!command.equals("exit")) {
@@ -49,7 +46,7 @@ public class FileProcessor {
 
                 // Have to create a new instance every time due to a JCommander 'feature'
                 // https://github.com/cbeust/jcommander/issues/271
-                handler = new CommandsHandler(io);
+                handler = new CommandsHandler();
             }
 
         } catch (Exception e) {

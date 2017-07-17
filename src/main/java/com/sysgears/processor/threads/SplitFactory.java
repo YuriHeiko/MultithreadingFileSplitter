@@ -15,7 +15,7 @@ public class SplitFactory extends Factory {
     }
 
     @Override
-    public Collection<Runnable> getWorkers() {
+    public Collection<Runnable> createChunks() {
         long fileSize = new File(fileName).length();
 
         holder.setTotalToBeDone(fileSize);

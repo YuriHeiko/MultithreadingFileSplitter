@@ -4,7 +4,6 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.sysgears.processor.exceptions.UIException;
-import com.sysgears.processor.io.IOHandler;
 import com.sysgears.processor.statistic.StatisticHolder;
 import com.sysgears.processor.threads.JoinFactory;
 import com.sysgears.processor.threads.Factory;
@@ -28,7 +27,7 @@ public class CommandJoin implements Executable {
 
         Factory factory = new JoinFactory(path, FileProcessor.partPrefix, holder, 0);
 
-        Collection<Runnable> workers = factory.getWorkers();
+        Collection<Runnable> workers = factory.createChunks();
         Thread statisticHandler = holder.startWatching();
 
         startWorkers(workers, threadsNumber);
