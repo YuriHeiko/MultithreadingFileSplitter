@@ -1,8 +1,6 @@
 package com.sysgears.processor.ui;
 
 import com.beust.jcommander.ParameterException;
-import com.sysgears.processor.exceptions.FileProcessorException;
-import com.sysgears.processor.io.IOHandler;
 
 import java.io.*;
 
@@ -12,7 +10,7 @@ public class FileProcessor {
 
     public final static int bufferSize = 1024;
 
-    public final static String partPrefix = ".part";
+    public final static String PART_PREFIX = ".part";
 
     public FileProcessor() {
     }

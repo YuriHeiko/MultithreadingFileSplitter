@@ -1,7 +1,8 @@
-package com.sysgears.processor.threads;
+package com.sysgears.processor.service.factories;
 
-import com.sysgears.processor.exceptions.ThreadsException;
 import com.sysgears.processor.io.JoinerIO;
+import com.sysgears.processor.service.ServiceException;
+import com.sysgears.processor.service.chunks.JoinChunk;
 import com.sysgears.processor.statistic.StatisticHolder;
 
 import java.io.File;
@@ -23,7 +24,7 @@ public class JoinFactory extends Factory {
         try {
             chunkNumber = Integer.parseInt(fileName.substring(parentName.length() + partPrefix.length()));
         } catch (NumberFormatException e) {
-            throw new ThreadsException("The wrong file name of the first part.");
+            throw new ServiceException("The wrong file name of the first part.");
         }
 
         List<Runnable> workers = new ArrayList<>();
@@ -33,13 +34,12 @@ public class JoinFactory extends Factory {
              file = new File(getNextChunkName(parentName)), chunkCounter++) {
 
             long length = file.length();
-            workers.add(new JoinChunk(new JoinerIO(), holder, parentName, file.getName(),
-                    parentFileLength, length));
+            workers.add(new JoinChunk(new JoinerIO(), holder, parentName, file.getName(), parentFileLength, length));
 
             parentFileLength += length;
         }
 
-        holder.setTotalToBeDone(parentFileLength);
+        holder.setTotal(parentFileLength);
 
         return workers;
     }

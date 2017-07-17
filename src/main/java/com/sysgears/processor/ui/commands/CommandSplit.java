@@ -3,10 +3,10 @@ package com.sysgears.processor.ui.commands;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import com.sysgears.processor.exceptions.UIException;
+import com.sysgears.processor.ui.UIException;
 import com.sysgears.processor.statistic.StatisticHolder;
-import com.sysgears.processor.threads.Factory;
-import com.sysgears.processor.threads.SplitFactory;
+import com.sysgears.processor.service.factories.Factory;
+import com.sysgears.processor.service.factories.SplitFactory;
 import com.sysgears.processor.ui.Executable;
 import com.sysgears.processor.ui.FileProcessor;
 
@@ -23,10 +23,9 @@ public class CommandSplit implements Executable {
 
     private final int startNumber = 1;
 
-    private final String GB = "GB";
-    private final String MB = "MB";
-    private final String KB = "kB";
-    private final String BYTES_REGEX = "(?=(" + KB + "|" + MB + "|" + GB + "))";
+    private final String BYTES_STRING = "kB|MB|GB";
+
+    private final String BYTES_REGEX = "(?=(" + BYTES_STRING + "))";
 
 
     @Override
@@ -34,13 +33,14 @@ public class CommandSplit implements Executable {
         long chunkSize = convertSizeToNumber(chunk);
         StatisticHolder holder = new StatisticHolder();
 
-        Factory factory = new SplitFactory(path, FileProcessor.partPrefix, holder, startNumber, chunkSize);
-        Thread statisticHandler = holder.startWatching();
+        Factory factory = new SplitFactory(path, FileProcessor.PART_PREFIX, holder, startNumber, chunkSize);
+        Thread statisticWatcher = holder.getWatcher();
 
+        statisticWatcher.start();
         startWorkers(factory.createChunks(), threadsNumber);
 
         try {
-            statisticHandler.join();
+            statisticWatcher.join();
         } catch (InterruptedException e) {
             throw new UIException("Statistic's process has been suddenly interrupted.");
         }
@@ -56,16 +56,16 @@ public class CommandSplit implements Executable {
             chunkSize = Long.valueOf(split[0]);
         } catch (NumberFormatException e) {
             throw new UIException("You've entered the wrong chunk size, it should be a positive number or " +
-                    "it can have next format NUMBER" + BYTES_REGEX.replace("(?=(", "[").replace("))","]"));
+                    "it can have next format NUMBER" + BYTES_STRING);
         }
 
         if (split.length > 1) {
             switch (split[1]) {
-                case GB:
+                case "GB":
                     chunkSize *= 1024;
-                case MB:
+                case "MB":
                     chunkSize *= 1024;
-                case KB:
+                case "kB":
                     chunkSize *= 1024;
             }
         }

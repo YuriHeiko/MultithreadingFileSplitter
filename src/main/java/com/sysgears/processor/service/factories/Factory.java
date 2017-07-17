@@ -1,4 +1,4 @@
-package com.sysgears.processor.threads;
+package com.sysgears.processor.service.factories;
 
 import com.sysgears.processor.statistic.StatisticHolder;
 

@@ -1,7 +1,6 @@
 package com.sysgears.processor.ui;
 
 import com.beust.jcommander.JCommander;
-import com.sysgears.processor.exceptions.FileProcessorException;
 
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;

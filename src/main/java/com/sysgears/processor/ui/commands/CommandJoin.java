@@ -3,10 +3,10 @@ package com.sysgears.processor.ui.commands;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import com.sysgears.processor.exceptions.UIException;
+import com.sysgears.processor.ui.UIException;
 import com.sysgears.processor.statistic.StatisticHolder;
-import com.sysgears.processor.threads.JoinFactory;
-import com.sysgears.processor.threads.Factory;
+import com.sysgears.processor.service.factories.JoinFactory;
+import com.sysgears.processor.service.factories.Factory;
 import com.sysgears.processor.ui.Executable;
 import com.sysgears.processor.ui.FileProcessor;
 
@@ -25,15 +25,16 @@ public class CommandJoin implements Executable {
 
         StatisticHolder holder = new StatisticHolder();
 
-        Factory factory = new JoinFactory(path, FileProcessor.partPrefix, holder, 0);
+        Factory factory = new JoinFactory(path, FileProcessor.PART_PREFIX, holder, 0);
 
         Collection<Runnable> workers = factory.createChunks();
-        Thread statisticHandler = holder.startWatching();
+        Thread statisticWatcher = holder.getWatcher();
 
+        statisticWatcher.start();
         startWorkers(workers, threadsNumber);
 
         try {
-            statisticHandler.join();
+            statisticWatcher.join();
         } catch (InterruptedException e) {
             throw new UIException("Statistic's process has been suddenly interrupted.");
         }

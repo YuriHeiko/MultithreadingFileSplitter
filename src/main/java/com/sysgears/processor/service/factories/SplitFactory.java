@@ -1,6 +1,7 @@
-package com.sysgears.processor.threads;
+package com.sysgears.processor.service.factories;
 
 import com.sysgears.processor.io.SplitterIO;
+import com.sysgears.processor.service.chunks.SplitChunk;
 import com.sysgears.processor.statistic.StatisticHolder;
 
 import java.io.File;
@@ -18,7 +19,7 @@ public class SplitFactory extends Factory {
     public Collection<Runnable> createChunks() {
         long fileSize = new File(fileName).length();
 
-        holder.setTotalToBeDone(fileSize);
+        holder.setTotal(fileSize);
         int chunksNumber = (int) (fileSize / chunkSize) + (fileSize % chunkSize > 0 ? 1 : 0);
 
         List<Runnable> workers = new ArrayList<>(chunksNumber);

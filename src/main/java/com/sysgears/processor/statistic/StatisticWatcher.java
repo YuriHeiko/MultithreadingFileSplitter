@@ -1,17 +1,17 @@
 package com.sysgears.processor.statistic;
 
-import com.sysgears.processor.exceptions.StatisticHolderException;
+public class StatisticWatcher implements Runnable {
+    private StatisticHolder statisticHolder;
 
-public class StatisticHandler implements Runnable {
-    StatisticHolder statisticHolder;
-
-    public StatisticHandler(StatisticHolder statisticHolder) {
+    StatisticWatcher(StatisticHolder statisticHolder) {
         this.statisticHolder = statisticHolder;
     }
 
     @Override
     public void run() {
-        while (!statisticHolder.isJobDone()) {
+        statisticHolder.startTime = System.currentTimeMillis();
+
+        while (statisticHolder.total != statisticHolder.progress.get()) {
             System.out.println(statisticHolder.toString());
 
             try {
