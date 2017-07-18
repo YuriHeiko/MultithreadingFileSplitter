@@ -4,7 +4,7 @@ import java.io.RandomAccessFile;
 
 /**
  * Synchronously writes into and asynchronously reads from a
- * {@code RandomAccessFile}
+ * {@code RandomAccessFile} stream
  */
 public class JoinerIO extends IOHandler {
     /**
@@ -19,10 +19,8 @@ public class JoinerIO extends IOHandler {
      * @throws IOHandlerException When {@code IOException} is arisen
      */
     @Override
-    public void write(final RandomAccessFile raf, final byte[] buffer, final long position, final int length) {
-        synchronized (raf) {
-            super.write(raf, buffer, position, length);
-        }
+    public synchronized void write(final RandomAccessFile raf, final byte[] buffer, final long position, final int length) {
+        super.write(raf, buffer, position, length);
     }
 
     /**

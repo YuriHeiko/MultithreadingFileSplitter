@@ -9,18 +9,13 @@ public class StatisticWatcher implements Runnable {
      * The {@code StatisticHolder} object
      */
     private StatisticHolder statisticHolder;
-    /**
-     * The delay
-     */
-    private final int DELAY = 1000;
-
 
     /**
      * Constructs an object
      *
      * @param statisticHolder The {@code StatisticHolder} object
      */
-    StatisticWatcher(StatisticHolder statisticHolder) {
+    StatisticWatcher(final StatisticHolder statisticHolder) {
         this.statisticHolder = statisticHolder;
     }
 
@@ -35,7 +30,7 @@ public class StatisticWatcher implements Runnable {
             System.out.println(statisticHolder.toString());
 
             try {
-                Thread.sleep(DELAY);
+                Thread.sleep(statisticHolder.delay);
             } catch (InterruptedException e) {
                 throw new StatisticHolderException("The statistical thread has been suddenly interrupted!");
             }

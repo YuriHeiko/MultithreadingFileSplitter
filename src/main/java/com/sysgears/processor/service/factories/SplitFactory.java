@@ -25,8 +25,8 @@ public class SplitFactory extends Factory {
      * @param chunkSize   The size of the chunk
      */
     public SplitFactory(final String fileName, final String partPrefix, final StatisticHolder holder,
-                        final int chunkNumber, final long chunkSize) {
-        super(fileName, partPrefix, holder, chunkNumber, chunkSize);
+                        final int chunkNumber, final int bufferSize, final long chunkSize) {
+        super(fileName, partPrefix, holder, chunkNumber, bufferSize, chunkSize);
     }
 
     /**
@@ -38,14 +38,19 @@ public class SplitFactory extends Factory {
     @Override
     public Collection<Runnable> createChunks() {
         if (!isFileExist(new File(fileName))) {
-            throw new ServiceException("The file does not exist (" + fileName + ").");
+            throw new ServiceException(fileName + " does not exist.");
         }
 
         long fileSize = new File(fileName).length();
+
+        if (fileSize < chunkSize) {
+            throw new ServiceException(String.format("The file size: %s is less than the part size: %s", fileSize, chunkSize));
+        }
+
         int chunksNumber = (int) (fileSize / chunkSize) + (fileSize % chunkSize > 0 ? 1 : 0);
         holder.setTotal(fileSize);
 
-        List<Runnable> workers = new ArrayList<>(chunksNumber);
+        List<Runnable> chunks = new ArrayList<>(chunksNumber);
         long size = chunkSize;
         for (int i = 0; i < chunksNumber; i++) {
             String nextChunkName = getNextChunkName(fileName);
@@ -54,7 +59,8 @@ public class SplitFactory extends Factory {
                 throw new ServiceException("The file has already existed(" + nextChunkName + ").");
             }
 
-            workers.add(new SplitChunk(new SplitterIO(), holder, nextChunkName, fileName, i * chunkSize, size));
+            chunks.add(new SplitChunk(new SplitterIO(), holder, nextChunkName, fileName, i * chunkSize, size,
+                    bufferSize));
 
             fileSize -= chunkSize;
             // tackles the last part issue
@@ -63,6 +69,6 @@ public class SplitFactory extends Factory {
             }
         }
 
-        return workers;
+        return chunks;
     }
 }

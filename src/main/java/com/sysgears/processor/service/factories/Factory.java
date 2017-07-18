@@ -30,6 +30,10 @@ public abstract class Factory {
      * A prefix of a part
      */
     final String partPrefix;
+    /**
+     * The default size of the buffer to read/write operations
+     */
+    final int bufferSize;
 
     /**
      * Constructs an object
@@ -39,8 +43,9 @@ public abstract class Factory {
      * @param holder      The {@code StatisticHolder}
      * @param chunkNumber The number of a chunk
      */
-    Factory(final String fileName, final String partPrefix, final StatisticHolder holder, final int chunkNumber) {
-        this(fileName, partPrefix, holder, chunkNumber, 0);
+    Factory(final String fileName, final String partPrefix, final StatisticHolder holder, final int chunkNumber,
+            final int bufferSize) {
+        this(fileName, partPrefix, holder, chunkNumber, bufferSize, 0);
     }
 
     /**
@@ -53,13 +58,14 @@ public abstract class Factory {
      * @param chunkSize   The size of the chunk
      */
     Factory(final String fileName, final String partPrefix, final StatisticHolder holder, final int chunkNumber,
-            final long chunkSize) {
+            final int bufferSize, final long chunkSize) {
 
         this.fileName = fileName;
         this.partPrefix = partPrefix;
         this.holder = holder;
         this.chunkNumber = chunkNumber;
         this.chunkSize = chunkSize;
+        this.bufferSize = bufferSize;
     }
 
     /**

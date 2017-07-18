@@ -21,11 +21,9 @@ public class JoinFactory extends Factory {
      * @param fileName    The name of a file
      * @param partPrefix  The prefix of a part
      * @param holder      The {@code StatisticHolder}
-     * @param chunkNumber The number of a chunk
      */
-    public JoinFactory(final String fileName, final String partPrefix, final StatisticHolder holder,
-                       final int chunkNumber) {
-        super(fileName, partPrefix, holder, chunkNumber);
+    public JoinFactory(final String fileName, final String partPrefix, final StatisticHolder holder, final int bufferSize) {
+        super(fileName, partPrefix, holder, 0, bufferSize);
     }
 
     /**
@@ -44,27 +42,30 @@ public class JoinFactory extends Factory {
             chunkNumber = Integer.parseInt(fileName.substring(parentName.length() + partPrefix.length()));
 
         } catch (StringIndexOutOfBoundsException | NumberFormatException e) {
-            throw new ServiceException("The wrong file name of the first part." + fileName);
+            throw new ServiceException("The wrong file name of the first part: " + fileName);
         }
 
         if (isFileExist(new File(parentName))) {
-            throw new ServiceException("The joined file has already existed(" + parentName + ").");
+            throw new ServiceException(parentName + " has already existed.");
         }
 
-        List<Runnable> workers = new ArrayList<>();
+        List<Runnable> chunks = new ArrayList<>();
 
         int chunkCounter = 0;
-        for (File file = new File(getNextChunkName(parentName)); isFileExist(file);
-             file = new File(getNextChunkName(parentName)), chunkCounter++) {
+        String nextChunkName = getNextChunkName(parentName);
+        for (File file = new File(nextChunkName); isFileExist(file); file = new File(nextChunkName), chunkCounter++) {
 
             long length = file.length();
-            workers.add(new JoinChunk(new JoinerIO(), holder, parentName, file.getName(), parentFileLength, length));
+            chunks.add(new JoinChunk(new JoinerIO(), holder, parentName, nextChunkName, parentFileLength, length,
+                    bufferSize));
 
             parentFileLength += length;
+
+            nextChunkName = getNextChunkName(parentName);
         }
 
         holder.setTotal(parentFileLength);
 
-        return workers;
+        return chunks;
     }
 }

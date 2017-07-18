@@ -4,7 +4,7 @@ import java.io.RandomAccessFile;
 
 /**
  * Asynchronously writes into and synchronously reads from a
- * {@code RandomAccessFile}
+ * {@code RandomAccessFile} stream
  */
 public class SplitterIO extends IOHandler {
     /**
@@ -35,9 +35,7 @@ public class SplitterIO extends IOHandler {
      * @throws IOHandlerException When {@code IOException} is arisen
      */
     @Override
-    public int read(final RandomAccessFile raf, byte[] buffer, final long position) throws IOHandlerException {
-        synchronized (raf) {
-            return super.read(raf, buffer, position);
-        }
+    public synchronized int read(final RandomAccessFile raf, byte[] buffer, final long position) throws IOHandlerException {
+        return super.read(raf, buffer, position);
     }
 }

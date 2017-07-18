@@ -31,7 +31,7 @@ abstract class Chunk implements Runnable {
     /**
      * The default size of the buffer to read/write operations
      */
-    private final static int BUFFER_SIZE = 1024;
+    private int bufferSize;
     /**
      * The file offset pointer
      */
@@ -52,18 +52,24 @@ abstract class Chunk implements Runnable {
      * @param chunkSize       The size of this part
      */
     Chunk(final IOHandler io, final StatisticHolder holder, final String fileToWriteName,
-          final String fileToReadName, final long pointer, final long chunkSize) {
+          final String fileToReadName, final long pointer, final long chunkSize, final int bufferSize) {
 
         this.IO = io;
         this.HOLDER = holder;
         this.POINTER = pointer;
         this.CHUNK_SIZE = chunkSize;
+        this.bufferSize = bufferSize;
 
         try {
             RAF_READ = new RandomAccessFile(fileToReadName, "r");
-            RAF_WRITE = new RandomAccessFile(fileToWriteName, "rw");
         } catch (FileNotFoundException e) {
             throw new ServiceException(fileToReadName + " doesn't exist.");
+        }
+
+        try {
+            RAF_WRITE = new RandomAccessFile(fileToWriteName, "rw");
+        } catch (FileNotFoundException e) {
+            throw new ServiceException(fileToWriteName + " doesn't exist.");
         }
     }
 
@@ -72,7 +78,7 @@ abstract class Chunk implements Runnable {
      */
     @Override
     public void run() {
-        int buffSize = CHUNK_SIZE < BUFFER_SIZE ? (int) CHUNK_SIZE : BUFFER_SIZE;
+        int buffSize = CHUNK_SIZE < bufferSize ? (int) CHUNK_SIZE : bufferSize;
         long total = CHUNK_SIZE;
         HOLDER.resetProgress(Thread.currentThread(), CHUNK_SIZE);
 

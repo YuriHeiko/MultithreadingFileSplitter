@@ -18,8 +18,8 @@ public class JoinChunk extends Chunk {
      * @param chunkSize       The size of this part
      */
     public JoinChunk(final IOHandler io, final StatisticHolder holder, final String fileToWriteName,
-                     final String fileToReadName, final long pointer, final long chunkSize) {
-        super(io, holder, fileToWriteName, fileToReadName, pointer, chunkSize);
+                     final String fileToReadName, final long pointer, final long chunkSize, final int bufferSize) {
+        super(io, holder, fileToWriteName, fileToReadName, pointer, chunkSize, bufferSize);
     }
 
     /**
