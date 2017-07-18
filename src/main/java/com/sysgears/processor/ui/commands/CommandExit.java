@@ -15,7 +15,7 @@ public class CommandExit extends Command {
      * @return The string with the command representation
      */
     @Override
-    public String execute(JCommander jCommander) {
+    public String execute(final JCommander jCommander) {
         return "exit";
     }
 }

@@ -9,6 +9,8 @@ import com.sysgears.processor.statistic.StatisticHolder;
 import com.sysgears.processor.ui.FileProcessor;
 import com.sysgears.processor.ui.UIException;
 
+import java.util.Collection;
+
 /**
  * A command to split a file into chunks
  */
@@ -23,16 +25,32 @@ public class CommandSplit extends Command {
      * The size of a chunk
      */
     @Parameter(names = "-s", required = true, description = "Chunks' size NUMBER[kB|MB|GB]")
-    private String chunk = "10MB";
+    private String chunkSize = FileProcessor.CHUNK_SIZE;
     /**
      * The number of threads
      */
     @Parameter(names = "-t", description = "Number of threads")
-    private int threadsNumber = 4;
+    private int threadsNumber = FileProcessor.THREADS_NUMBER;
     /**
      * The first part number
      */
-    private final int START_NUMBER = 1;
+    @Parameter(names = "-f", description = "First part number")
+    private int startNumber = FileProcessor.START_NUMBER;
+    /**
+     * The statistic output delay
+     */
+    @Parameter(names = "-d", description = "Statistic output delay(ms)")
+    private int delay = FileProcessor.DELAY;
+    /**
+     * The part prefix name
+     */
+    @Parameter(names = "-n", description = "Part prefix name")
+    private String partPrefix = FileProcessor.PART_PREFIX;
+    /**
+     * The IO buffer size
+     */
+    @Parameter(names = "-b", description = "IO buffer size(bytes)")
+    private int bufferSize = FileProcessor.BUFFER_SIZE;
     /**
      * The string representation of byte contractions
      */
@@ -49,21 +67,12 @@ public class CommandSplit extends Command {
      * @return The string with the command representation
      */
     @Override
-    public String execute(JCommander jCommander) {
-        long chunkSize = convertSizeToNumber(chunk);
-        StatisticHolder holder = new StatisticHolder();
+    public String execute(final JCommander jCommander) {
+        StatisticHolder holder = new StatisticHolder(delay);
+        Factory factory = new SplitFactory(path, partPrefix, holder, startNumber, bufferSize,
+                                            convertSizeToNumber(this.chunkSize));
 
-        Factory factory = new SplitFactory(path, FileProcessor.PART_PREFIX, holder, START_NUMBER, chunkSize);
-        Thread statisticWatcher = holder.getWatcher();
-
-        statisticWatcher.start();
-        startTasks(factory.createChunks(), threadsNumber);
-
-        try {
-            statisticWatcher.join();
-        } catch (InterruptedException e) {
-            throw new UIException("Statistic's process has been suddenly interrupted.");
-        }
+        startTasks(factory, holder, threadsNumber);
 
         return "split";
     }
@@ -74,7 +83,7 @@ public class CommandSplit extends Command {
      * @param stringSize The string with byte constraints
      * @return The number
      */
-    long convertSizeToNumber(final String stringSize) {
+    private long convertSizeToNumber(final String stringSize) {
         long chunkSize;
         String[] split = stringSize.split(BYTES_REGEX);
 

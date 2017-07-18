@@ -29,6 +29,19 @@ public class StatisticHolder {
      * The starting time
      */
     long startTime;
+    /**
+     * The delay
+     */
+    int delay;
+
+    /**
+     * Constructs an object
+     *
+     * @param delay The delay of statistic output
+     */
+    public StatisticHolder(int delay) {
+        this.delay = delay;
+    }
 
     /**
      * Sets a final value of threads work.

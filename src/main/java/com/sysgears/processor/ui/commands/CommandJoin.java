@@ -19,14 +19,29 @@ public class CommandJoin extends Command {
     /**
      * The path to the first chunk
      */
-    @Parameter(names = "-p", required = true, description = "The first part absolute file path, i.e. '-p C:/DIR/file.example.part1'")
+    @Parameter(names = "-p", required = true, description = "The first part absolute file path, i.e. " +
+            "'-p C:/DIR/file.example.part1'")
     private String path;
-
     /**
      * The number of threads
      */
     @Parameter(names = "-t", description = "Number of threads")
-    private int threadsNumber = 4;
+    private int threadsNumber = FileProcessor.THREADS_NUMBER;
+    /**
+     * The statistic output delay
+     */
+    @Parameter(names = "-d", description = "Statistic output delay(ms)")
+    private int delay = FileProcessor.DELAY;
+    /**
+     * The part prefix name
+     */
+    @Parameter(names = "-n", description = "Part prefix name")
+    private String partPrefix = FileProcessor.PART_PREFIX;
+    /**
+     * The IO buffer size
+     */
+    @Parameter(names = "-b", description = "IO buffer size(bytes)")
+    private int bufferSize = FileProcessor.BUFFER_SIZE;
 
     /**
      * Joins parts of a file into a big one
@@ -35,23 +50,10 @@ public class CommandJoin extends Command {
      * @return The string with the command representation
      */
     @Override
-    public String execute(JCommander jCommander) {
+    public String execute(final JCommander jCommander) {
+        StatisticHolder holder = new StatisticHolder(delay);
 
-        StatisticHolder holder = new StatisticHolder();
-
-        Factory factory = new JoinFactory(path, FileProcessor.PART_PREFIX, holder, 0);
-
-        Collection<Runnable> workers = factory.createChunks();
-        Thread statisticWatcher = holder.getWatcher();
-
-        statisticWatcher.start();
-        startTasks(workers, threadsNumber);
-
-        try {
-            statisticWatcher.join();
-        } catch (InterruptedException e) {
-            throw new UIException("Statistic's process has been suddenly interrupted.");
-        }
+        startTasks(new JoinFactory(path, partPrefix, holder, bufferSize), holder, threadsNumber);
 
         return "join";
     }

@@ -23,6 +23,26 @@ public class FileProcessor {
      * The default prefix string of a part name
      */
     public final static String PART_PREFIX = ".part";
+    /**
+     * The default number of threads
+     */
+    public final static int THREADS_NUMBER = 4;
+    /**
+     * The default first part number
+     */
+    public final static int START_NUMBER = 1;
+    /**
+     * The default statistic output delay
+     */
+    public final static int DELAY = 1000;
+    /**
+     * The default IO buffer size
+     */
+    public final static int BUFFER_SIZE = 1024;
+    /**
+     * The default size of a chunk
+     */
+    public final static String CHUNK_SIZE = "10MB";
 
     /**
      * Constructs an object with default console Input and
