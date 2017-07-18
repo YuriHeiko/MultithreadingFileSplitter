@@ -1,4 +1,4 @@
-package com.sysgears.processor.service;
+package com.sysgears.service;
 
 /**
  * Thrown to indicate that the error is happened on the

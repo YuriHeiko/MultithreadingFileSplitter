@@ -1,12 +1,12 @@
-package com.sysgears.processor.service.chunks;
+package com.sysgears.service.chunks;
 
-import com.sysgears.processor.io.IOHandler;
+import com.sysgears.IOHandler;
 import com.sysgears.statistic.StatisticHolder;
 
 /**
- * Represents a part of a file to split
+ * Represents a part of a file to join
  */
-public class SplitChunk extends Chunk {
+public class JoinChunk extends Chunk {
     /**
      * Constructs an object
      *
@@ -17,13 +17,13 @@ public class SplitChunk extends Chunk {
      * @param pointer         The file offset pointer
      * @param chunkSize       The size of this part
      */
-    public SplitChunk(final IOHandler io, final StatisticHolder holder, final String fileToWriteName,
-                      final String fileToReadName, final long pointer, final long chunkSize, final int bufferSize) {
+    public JoinChunk(final IOHandler io, final StatisticHolder holder, final String fileToWriteName,
+                     final String fileToReadName, final long pointer, final long chunkSize, final int bufferSize) {
         super(io, holder, fileToWriteName, fileToReadName, pointer, chunkSize, bufferSize);
     }
 
     /**
-     * Calls the action to take a part from a file
+     * Calls the action to join a part to a resulting file
      *
      * @param total    The number of bytes to process
      * @param buffSize The size of the buffer
@@ -31,6 +31,6 @@ public class SplitChunk extends Chunk {
      */
     @Override
     public int callAction(final long total, final int buffSize) {
-        return doAction(POINTER + CHUNK_SIZE - total, CHUNK_SIZE - total, buffSize);
+        return doAction(CHUNK_SIZE - total, POINTER + CHUNK_SIZE - total, buffSize);
     }
 }

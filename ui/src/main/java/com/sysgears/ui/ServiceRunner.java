@@ -1,37 +1,44 @@
-package com.sysgears.ui.commands;
+package com.sysgears.ui;
 
-import com.beust.jcommander.JCommander;
-import com.sysgears.processor.service.factories.Factory;
+import com.sysgears.service.factories.Factory;
 import com.sysgears.statistic.StatisticHolder;
-import com.sysgears.ui.UIException;
 
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-/**
- * The commands' interface
- */
-public abstract class Command {
+public class ServiceRunner {
     /**
-     * The command to execute
-     *
-     * @param jCommander The {@code JCommander} object
-     * @return The string with the command representation
+     * The {@link Factory} to create a collection of chunks
      */
-    public abstract String execute(final JCommander jCommander);
+    private final Factory factory;
+    /**
+     * The {@link StatisticHolder} to collect and show statistic
+     */
+    private final StatisticHolder holder;
+    /**
+     * The number of threads in the thread pool
+     */
+    private final int threadsNumber;
 
     /**
-     * Starts received tasks
+     * Constructs an object
      *
-     * @param factory       The {@link Factory} to create a collection of
-     *                      chunks
-     * @param holder        The {@link StatisticHolder} to collect and show
-     *                      statistic
+     * @param factory       The {@link Factory} to create a collection of chunks
+     * @param holder        The {@link StatisticHolder} to collect and show statistic
      * @param threadsNumber The number of threads in the thread pool
      */
-    void startTasks(final Factory factory, final StatisticHolder holder, final int threadsNumber) {
+    public ServiceRunner(Factory factory, StatisticHolder holder, int threadsNumber) {
+        this.factory = factory;
+        this.holder = holder;
+        this.threadsNumber = threadsNumber;
+    }
+
+    /**
+     * Starts service tasks
+     */
+    public void run() {
         Collection<Runnable> chunks = factory.createChunks();
 
         Thread statisticWatcher = holder.getWatcher();

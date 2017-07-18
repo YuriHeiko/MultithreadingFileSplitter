@@ -3,15 +3,16 @@ package com.sysgears.ui.commands;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import com.sysgears.processor.service.factories.JoinFactory;
+import com.sysgears.service.factories.JoinFactory;
 import com.sysgears.statistic.StatisticHolder;
 import com.sysgears.ui.FileProcessor;
+import com.sysgears.ui.ServiceRunner;
 
 /**
  * A command to glue a parts into one file
  */
 @Parameters(commandNames = "join", commandDescription = "Join parts into file")
-public class CommandJoin extends Command {
+public class CommandJoin implements Executable {
     /**
      * The path to the first chunk
      */
@@ -49,7 +50,7 @@ public class CommandJoin extends Command {
     public String execute(final JCommander jCommander) {
         StatisticHolder holder = new StatisticHolder(delay);
 
-        startTasks(new JoinFactory(path, partPrefix, holder, bufferSize), holder, threadsNumber);
+        new ServiceRunner(new JoinFactory(path, partPrefix, holder, bufferSize), holder,threadsNumber).run();
 
         return "join";
     }

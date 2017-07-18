@@ -1,4 +1,6 @@
-package com.sysgears.processor.io;
+package com.sysgears;
+
+import com.sysgears.io.IOHandlerException;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;

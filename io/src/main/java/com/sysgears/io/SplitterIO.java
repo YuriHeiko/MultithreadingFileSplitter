@@ -1,4 +1,6 @@
-package com.sysgears.processor.io;
+package com.sysgears.io;
+
+import com.sysgears.IOHandler;
 
 import java.io.RandomAccessFile;
 

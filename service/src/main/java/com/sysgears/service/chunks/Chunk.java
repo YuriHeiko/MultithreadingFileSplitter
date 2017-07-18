@@ -1,7 +1,7 @@
-package com.sysgears.processor.service.chunks;
+package com.sysgears.service.chunks;
 
-import com.sysgears.processor.io.IOHandler;
-import com.sysgears.processor.service.ServiceException;
+import com.sysgears.IOHandler;
+import com.sysgears.service.ServiceException;
 import com.sysgears.statistic.StatisticHolder;
 
 import java.io.FileNotFoundException;

@@ -1,8 +1,8 @@
-package com.sysgears.processor.service.factories;
+package com.sysgears.service.factories;
 
-import com.sysgears.processor.io.JoinerIO;
-import com.sysgears.processor.service.ServiceException;
-import com.sysgears.processor.service.chunks.JoinChunk;
+import com.sysgears.io.JoinerIO;
+import com.sysgears.service.ServiceException;
+import com.sysgears.service.chunks.JoinChunk;
 import com.sysgears.statistic.StatisticHolder;
 
 import java.io.File;

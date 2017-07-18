@@ -1,4 +1,4 @@
-package com.sysgears.processor.service.factories;
+package com.sysgears.service.factories;
 
 
 import com.sysgears.statistic.StatisticHolder;

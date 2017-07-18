@@ -1,7 +1,7 @@
 package com.sysgears.ui;
 
 import com.beust.jcommander.ParameterException;
-import com.sysgears.processor.service.ServiceException;
+import com.sysgears.service.ServiceException;
 
 import java.io.*;
 

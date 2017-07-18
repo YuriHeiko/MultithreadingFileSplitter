@@ -7,7 +7,7 @@ import com.beust.jcommander.Parameters;
  * A command to show help
  */
 @Parameters(commandNames = "help", commandDescription = "Help")
-public class CommandHelp extends Command {
+public class CommandHelp implements Executable {
     /**
      * Shows help
      *

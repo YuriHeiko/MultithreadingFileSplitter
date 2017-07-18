@@ -3,17 +3,18 @@ package com.sysgears.ui.commands;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import com.sysgears.processor.service.factories.Factory;
-import com.sysgears.processor.service.factories.SplitFactory;
+import com.sysgears.service.factories.Factory;
+import com.sysgears.service.factories.SplitFactory;
 import com.sysgears.statistic.StatisticHolder;
 import com.sysgears.ui.FileProcessor;
+import com.sysgears.ui.ServiceRunner;
 import com.sysgears.ui.UIException;
 
 /**
  * A command to split a file into chunks
  */
 @Parameters(commandNames = "split", commandDescription = "Break file into parts")
-public class CommandSplit extends Command {
+public class CommandSplit implements Executable {
     /**
      * The path to the first chunk
      */
@@ -67,10 +68,9 @@ public class CommandSplit extends Command {
     @Override
     public String execute(final JCommander jCommander) {
         StatisticHolder holder = new StatisticHolder(delay);
-        Factory factory = new SplitFactory(path, partPrefix, holder, startNumber, bufferSize,
-                                            convertSizeToNumber(this.chunkSize));
+        Factory factory = new SplitFactory(path, partPrefix, holder, startNumber, bufferSize, convertToNumber(chunkSize));
 
-        startTasks(factory, holder, threadsNumber);
+        new ServiceRunner(factory, holder,threadsNumber).run();
 
         return "split";
     }
@@ -81,7 +81,7 @@ public class CommandSplit extends Command {
      * @param stringSize The string with byte constraints
      * @return The number
      */
-    private long convertSizeToNumber(final String stringSize) {
+    private long convertToNumber(final String stringSize) {
         long chunkSize;
         String[] split = stringSize.split(BYTES_REGEX);
 

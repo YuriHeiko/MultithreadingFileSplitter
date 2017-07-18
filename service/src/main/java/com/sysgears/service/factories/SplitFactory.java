@@ -1,8 +1,8 @@
-package com.sysgears.processor.service.factories;
+package com.sysgears.service.factories;
 
-import com.sysgears.processor.io.SplitterIO;
-import com.sysgears.processor.service.ServiceException;
-import com.sysgears.processor.service.chunks.SplitChunk;
+import com.sysgears.io.SplitterIO;
+import com.sysgears.service.ServiceException;
+import com.sysgears.service.chunks.SplitChunk;
 import com.sysgears.statistic.StatisticHolder;
 
 import java.io.File;

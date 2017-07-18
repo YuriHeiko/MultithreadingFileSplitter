@@ -1,4 +1,4 @@
-package com.sysgears.processor.io;
+package com.sysgears.io;
 
 /**
  * Thrown to indicate that the IO error is arisen
