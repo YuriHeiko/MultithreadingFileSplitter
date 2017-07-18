@@ -85,10 +85,6 @@ public class FileProcessor {
 //                } catch (UIException | StatisticHolderException | ServiceException | IOHandlerException e) {
                     System.out.println(e.getMessage() + System.lineSeparator());
                 }
-
-                // Have to create a new instance every time due to a JCommander 'feature'
-                // https://github.com/cbeust/jcommander/issues/271
-                handler = new CommandsHandler();
             }
 
         } catch (Exception e) {
