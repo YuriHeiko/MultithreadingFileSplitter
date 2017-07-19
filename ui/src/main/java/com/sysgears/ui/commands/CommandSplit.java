@@ -70,7 +70,7 @@ public class CommandSplit implements Executable {
         StatisticHolder holder = new StatisticHolder(delay);
         Factory factory = new SplitFactory(path, partPrefix, holder, startNumber, bufferSize, convertToNumber(chunkSize));
 
-        new ServiceRunner(factory, holder,threadsNumber).run();
+        new ServiceRunner(factory, holder, threadsNumber).run();
 
         return "split";
     }
