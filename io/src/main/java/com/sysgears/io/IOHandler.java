@@ -1,4 +1,4 @@
-package com.sysgears;
+package com.sysgears.io;
 
 import com.sysgears.io.IOHandlerException;
 

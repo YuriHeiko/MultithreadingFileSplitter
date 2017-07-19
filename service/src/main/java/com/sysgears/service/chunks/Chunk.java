@@ -1,6 +1,6 @@
 package com.sysgears.service.chunks;
 
-import com.sysgears.IOHandler;
+import com.sysgears.io.IOHandler;
 import com.sysgears.service.ServiceException;
 import com.sysgears.statistic.StatisticHolder;
 

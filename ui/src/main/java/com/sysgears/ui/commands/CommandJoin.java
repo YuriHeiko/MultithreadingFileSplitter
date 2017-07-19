@@ -50,7 +50,7 @@ public class CommandJoin implements Executable {
     public String execute(final JCommander jCommander) {
         StatisticHolder holder = new StatisticHolder(delay);
 
-        new ServiceRunner(new JoinFactory(path, partPrefix, holder, bufferSize), holder,threadsNumber).run();
+        new ServiceRunner(new JoinFactory(path, partPrefix, holder, bufferSize), holder, threadsNumber).run();
 
         return "join";
     }
