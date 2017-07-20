@@ -82,7 +82,7 @@ public class CommandSplit implements IExecutable {
         final IOHandler syncReadIO = new SyncReadIO();
         final ISplittable<IProcessable> fileSplitter = new FileSplitter(fileSize, path, convertToNumber(chunkSize), partPrefix, 0);
         final IHolder<Long, Pair<Long, Long>> holder = new ConcurrentRecordsHolder<>();
-        final Watcher<Long, Pair<Long, Long>> watcher = new Watcher<>(fileSize, delay, holder);
+        final Watcher<Long, Pair<Long, Long>> watcher = new Watcher<>(holder, fileSize, delay);
         final IProcessableProcessor processor = new IOProcessor(syncReadIO, holder, bufferSize);
         final FileFactory fileFactory = new FileFactory(fileSplitter, processor);
         final ServiceRunner serviceRunner = new ServiceRunner(fileFactory, watcher, threadsNumber);
