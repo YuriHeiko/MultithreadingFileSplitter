@@ -4,21 +4,16 @@ package com.sysgears.statistic;
 import javafx.util.Pair;
 import java.util.Map;
 
-public class Watcher<T, U extends Pair<Long, Long>> implements IWatchable<T, U> {
+public class Watcher<T, U extends Pair<Long, Long>> implements Runnable {
 
-    private final IHoldable<T, U> holder;
+    private final IHolder<T, U> holder;
     private final long finalProgress;
     private final long outputDelay;
 
-    public Watcher(final long finalProgress, final long outputDelay) {
-        this.holder = new ConcurrentRecordsHolder<>();
+    public Watcher(IHolder<T, U> holder, long finalProgress, long outputDelay) {
+        this.holder = holder;
         this.finalProgress = finalProgress;
         this.outputDelay = outputDelay;
-    }
-
-    @Override
-    public IHoldable<T, U> getHolder() {
-        return holder;
     }
 
     @Override

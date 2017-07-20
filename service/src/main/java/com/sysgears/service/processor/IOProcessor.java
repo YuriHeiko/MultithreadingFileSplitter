@@ -1,18 +1,18 @@
 package com.sysgears.service.processor;
 
-import com.sysgears.fileprocessor.io.IOHandler;
-import com.sysgears.fileprocessor.io.IOHandlerException;
+import com.sysgears.io.IOHandler;
+import com.sysgears.io.IOHandlerException;
 import com.sysgears.service.ServiceException;
 import com.sysgears.service.processor.processable.IProcessable;
-import com.sysgears.statistic.IHoldable;
+import com.sysgears.statistic.IHolder;
 import javafx.util.Pair;
 
 public class IOProcessor implements IProcessableProcessor {
     private final IOHandler io;
-    private final IHoldable<Long, Pair<Long, Long>> holder;
+    private final IHolder<Long, Pair<Long, Long>> holder;
     private final int bufferSize;
 
-    public IOProcessor(final IOHandler io, final IHoldable<Long, Pair<Long, Long>> holder, final int bufferSize) {
+    public IOProcessor(final IOHandler io, final IHolder<Long, Pair<Long, Long>> holder, final int bufferSize) {
         this.io = io;
         this.holder = holder;
         this.bufferSize = bufferSize;
@@ -21,7 +21,7 @@ public class IOProcessor implements IProcessableProcessor {
     @Override
     public boolean process(final IProcessable processable) {
         final byte[] buffer = new byte[bufferSize];
-        int bytes = 0;
+        int bytes;
         long regress = processable.getSize();
 
         while (regress > 0) {

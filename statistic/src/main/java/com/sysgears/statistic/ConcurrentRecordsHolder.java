@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
-public class ConcurrentRecordsHolder<T, U extends Pair<Long, Long>> implements IHoldable<T, U> {
+public class ConcurrentRecordsHolder<T, U extends Pair<Long, Long>> implements IHolder<T, U> {
 
     private final Map<T, U> records = new ConcurrentSkipListMap<>();
 

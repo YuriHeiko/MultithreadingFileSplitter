@@ -2,7 +2,7 @@ package com.sysgears.statistic;
 
 import java.util.Map;
 
-public interface IHoldable<T, U> {
+public interface IHolder<T, U> {
     U add(T id, U value);
 
     U get(T id);
