@@ -1,22 +1,23 @@
 package com.sysgears.ui;
 
-import com.sysgears.service.factories.Factory;
-import com.sysgears.statistic.StatisticHolder;
+import com.sysgears.fileprocessor.service.FileFactory;
+import com.sysgears.fileprocessor.service.FileWorker;
+import com.sysgears.fileprocessor.statistic.IWatchable;
+import javafx.util.Pair;
 
-import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class ServiceRunner {
     /**
-     * The {@link Factory} to create a collection of chunks
+     * The {@link FileFactory} to create a collection of chunks
      */
-    private final Factory factory;
+    private final FileFactory factory;
     /**
-     * The {@link StatisticHolder} to collect and show statistic
+     * The {@link IWatchable} to collect and show statistic
      */
-    private final StatisticHolder holder;
+    private final IWatchable<Long, Pair<Long, Long>> watcher;
     /**
      * The number of threads in the thread pool
      */
@@ -25,13 +26,15 @@ public class ServiceRunner {
     /**
      * Constructs an object
      *
-     * @param factory       The {@link Factory} to create a collection of chunks
-     * @param holder        The {@link StatisticHolder} to collect and show statistic
+     * @param factory       The {@link FileFactory} to create a collection of chunks
+     * @param watcher       The {@link IWatchable} to collect and show statistic
      * @param threadsNumber The number of threads in the thread pool
      */
-    public ServiceRunner(Factory factory, StatisticHolder holder, int threadsNumber) {
+    public ServiceRunner(final FileFactory factory,
+                         final IWatchable<Long, Pair<Long, Long>> watcher,
+                         final int threadsNumber) {
         this.factory = factory;
-        this.holder = holder;
+        this.watcher = watcher;
         this.threadsNumber = threadsNumber;
     }
 
@@ -39,29 +42,19 @@ public class ServiceRunner {
      * Starts service tasks
      */
     public void run() {
-        Collection<Runnable> chunks = factory.createChunks();
+        ExecutorService service = Executors.newFixedThreadPool(threadsNumber + 1);
+        service.submit(watcher);
 
-        Thread statisticWatcher = holder.getWatcher();
-        statisticWatcher.start();
-
-        ExecutorService service = Executors.newFixedThreadPool(threadsNumber);
-
-        for (Runnable chunk : chunks) {
-            service.submit(chunk);
+        FileWorker fileWorker;
+        while ((fileWorker = factory.create()) != null) {
+            service.submit(fileWorker);
         }
-
         service.shutdown();
 
         try {
             service.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             throw new UIException("Work awaiting has been suddenly interrupted.");
-        }
-
-        try {
-            statisticWatcher.join();
-        } catch (InterruptedException e) {
-            throw new UIException("Statistic's awaiting has been suddenly interrupted.");
         }
     }
 }

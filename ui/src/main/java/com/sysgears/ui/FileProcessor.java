@@ -1,7 +1,7 @@
 package com.sysgears.ui;
 
 import com.beust.jcommander.ParameterException;
-import com.sysgears.service.ServiceException;
+import com.sysgears.fileprocessor.service.ServiceException;
 
 import java.io.*;
 
@@ -82,7 +82,7 @@ public class FileProcessor {
                     System.out.println("You've entered the wrong command. Try again or type 'help':");
 
                 } catch (UIException | ServiceException e) {
-//                } catch (UIException | StatisticHolderException | ServiceException | IOHandlerException e) {
+//                } catch (UIException | StatisticException | ServiceException | IOHandlerException e) {
                     System.out.println(e.getMessage() + System.lineSeparator());
                 }
             }

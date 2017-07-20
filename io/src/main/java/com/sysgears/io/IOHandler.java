@@ -1,7 +1,5 @@
 package com.sysgears.io;
 
-import com.sysgears.io.IOHandlerException;
-
 import java.io.IOException;
 import java.io.RandomAccessFile;
 

@@ -3,18 +3,28 @@ package com.sysgears.ui.commands;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import com.sysgears.service.factories.Factory;
-import com.sysgears.service.factories.SplitFactory;
-import com.sysgears.statistic.StatisticHolder;
+import com.sysgears.fileprocessor.io.IOHandler;
+import com.sysgears.fileprocessor.io.SyncReadIO;
+import com.sysgears.fileprocessor.service.FileFactory;
+import com.sysgears.fileprocessor.service.processor.IOProcessor;
+import com.sysgears.fileprocessor.service.processor.IProcessableProcessor;
+import com.sysgears.fileprocessor.service.processor.splittable.FileSplitter;
+import com.sysgears.fileprocessor.service.processor.processable.IProcessable;
+import com.sysgears.fileprocessor.service.processor.splittable.ISplittable;
+import com.sysgears.fileprocessor.statistic.IWatchable;
+import com.sysgears.fileprocessor.statistic.Watcher;
 import com.sysgears.ui.FileProcessor;
 import com.sysgears.ui.ServiceRunner;
 import com.sysgears.ui.UIException;
+import javafx.util.Pair;
+
+import java.io.File;
 
 /**
  * A command to split a file into chunks
  */
 @Parameters(commandNames = "split", commandDescription = "Break file into parts")
-public class CommandSplit implements Executable {
+public class CommandSplit implements IExecutable {
     /**
      * The path to the first chunk
      */
@@ -67,10 +77,15 @@ public class CommandSplit implements Executable {
      */
     @Override
     public String execute(final JCommander jCommander) {
-        StatisticHolder holder = new StatisticHolder(delay);
-        Factory factory = new SplitFactory(path, partPrefix, holder, startNumber, bufferSize, convertToNumber(chunkSize));
+        final long fileSize = new File(path).length();
+        final IOHandler syncReadIO = new SyncReadIO();
+        final ISplittable<IProcessable> fileSplitter = new FileSplitter(fileSize, path, convertToNumber(chunkSize), partPrefix, 0);
+        final IWatchable<Long, Pair<Long, Long>> watcher = new Watcher<>(fileSize, delay);
+        final IProcessableProcessor processor = new IOProcessor(syncReadIO, watcher.getHolder(), bufferSize);
+        final FileFactory fileFactory = new FileFactory(fileSplitter, processor);
+        final ServiceRunner serviceRunner = new ServiceRunner(fileFactory, watcher, threadsNumber);
 
-        new ServiceRunner(factory, holder, threadsNumber).run();
+        serviceRunner.run();
 
         return "split";
     }

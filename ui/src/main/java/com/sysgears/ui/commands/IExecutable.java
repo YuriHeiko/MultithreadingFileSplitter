@@ -5,7 +5,7 @@ import com.beust.jcommander.JCommander;
 /**
  * The commands' interface
  */
-public interface Executable {
+public interface IExecutable {
     /**
      * The command to execute
      *

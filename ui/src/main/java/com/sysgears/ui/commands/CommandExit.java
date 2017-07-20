@@ -7,7 +7,7 @@ import com.beust.jcommander.Parameters;
  * A command to quit program
  */
 @Parameters(commandNames = "exit", commandDescription = "Quit program")
-public class CommandExit implements Executable {
+public class CommandExit implements IExecutable {
     /**
      * Shows help
      *

@@ -23,7 +23,7 @@ public class CommandsHandler {
 
         jCommander.parse(args);
         JCommander parsedJCommander = jCommander.getCommands().get(jCommander.getParsedCommand());
-        Executable executable = (Executable) parsedJCommander.getObjects().get(0);
+        IExecutable executable = (IExecutable) parsedJCommander.getObjects().get(0);
         return executable.execute(jCommander);
     }
 }

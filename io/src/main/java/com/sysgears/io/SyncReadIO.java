@@ -6,7 +6,7 @@ import java.io.RandomAccessFile;
  * Asynchronously writes into and synchronously reads from a
  * {@code RandomAccessFile} stream
  */
-public class SplitterIO extends IOHandler {
+public class SyncReadIO extends IOHandler {
     /**
      * Sets a {@link RandomAccessFile} pointer into {@code position} than
      * asynchronously writes buffer bytes starting from 0 and ending at

@@ -1,7 +1,5 @@
-package com.sysgears;
+package com.sysgears.ui;
 
-
-import com.sysgears.ui.FileProcessor;
 
 /**
  * Runs a console file splitter
