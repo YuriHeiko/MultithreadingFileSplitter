@@ -31,7 +31,7 @@ public class FileSplitter extends AbstractFileHandler {
     }
 
     @Override
-    public FileChunk nextPart() {
+    public FileChunk next() {
         computeRegress();
 
         RandomAccessFile destination;

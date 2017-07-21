@@ -1,6 +1,5 @@
 package com.sysgears.ui.commands;
 
-import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.sysgears.io.IOHandler;
@@ -10,7 +9,6 @@ import com.sysgears.service.processor.IOProcessor;
 import com.sysgears.service.processor.IProcessableProcessor;
 import com.sysgears.service.processor.processable.IProcessable;
 import com.sysgears.service.processor.splittable.FileSplitter;
-import com.sysgears.service.processor.splittable.ISplittable;
 import com.sysgears.statistic.ConcurrentRecordsHolder;
 import com.sysgears.statistic.IHolder;
 import com.sysgears.statistic.Watcher;
@@ -21,6 +19,7 @@ import com.sysgears.ui.UIException;
 import javafx.util.Pair;
 
 import java.io.File;
+import java.util.Iterator;
 
 /**
  * A command to split a file into chunks
@@ -78,7 +77,7 @@ public class CommandSplit implements IExecutable {
     public void execute() {
         final long fileSize = new File(path).length();
         final IOHandler syncReadIO = new SyncReadIO();
-        final ISplittable<IProcessable> fileSplitter = new FileSplitter(fileSize, path, convertToNumber(chunkSize), partPrefix, 0);
+        final Iterator<IProcessable> fileSplitter = new FileSplitter(fileSize, path, convertToNumber(chunkSize), partPrefix, 0);
         final IHolder<Long, Pair<Long, Long>> holder = new ConcurrentRecordsHolder<>();
         final Watcher<Long, Pair<Long, Long>> watcher = new Watcher<>(holder, fileSize, delay);
         final IProcessableProcessor processor = new IOProcessor(syncReadIO, holder, bufferSize);

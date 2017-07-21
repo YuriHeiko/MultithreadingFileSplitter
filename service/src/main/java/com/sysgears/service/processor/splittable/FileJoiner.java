@@ -6,24 +6,20 @@ import com.sysgears.service.processor.processable.FileChunk;
 import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
 
-public class FileJoiner implements ISplittable<FileChunk> {
-    private final long fileSize;
+public class FileJoiner extends AbstractFileHandler {
     private final String fileName;
-    private final long chunkSize;
     private final String partPrefix;
     private final RandomAccessFile destination;
 
     private int partNumber;
-    private long regress;
 
     public FileJoiner(final long fileSize,
-                      final String fileName,
-                      final long chunkSize,
-                      final String partPrefix,
-                      final int partNumber) {
-        this.fileSize = fileSize;
+                        final String fileName,
+                        final long chunkSize,
+                        final String partPrefix,
+                        final int partNumber) {
+        super(fileSize, chunkSize);
         this.fileName = fileName;
-        this.chunkSize = chunkSize;
         this.partPrefix = partPrefix;
         this.partNumber = partNumber;
 
@@ -37,12 +33,7 @@ public class FileJoiner implements ISplittable<FileChunk> {
     }
 
     @Override
-    public boolean hasMore() {
-        return regress > 0;
-    }
-
-    @Override
-    public FileChunk nextPart() {
+    public FileChunk next() {
 
         return null;
     }

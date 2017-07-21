@@ -1,16 +1,16 @@
 package com.sysgears.service.processor.splittable;
 
-import com.sysgears.service.ServiceException;
-import com.sysgears.service.processor.processable.FileChunk;
 import com.sysgears.service.processor.processable.IProcessable;
 
-public abstract class AbstractFileHandler implements ISplittable<IProcessable> {
+import java.util.Iterator;
+
+public abstract class AbstractFileHandler implements Iterator<IProcessable> {
     final long fileSize;
-    final long chunkSize;
+    private final long chunkSize;
 
     long regress;
 
-    public AbstractFileHandler(final long fileSize, final long chunkSize) {
+    AbstractFileHandler(final long fileSize, final long chunkSize) {
         this.fileSize = fileSize;
         this.chunkSize = chunkSize;
 
@@ -18,7 +18,7 @@ public abstract class AbstractFileHandler implements ISplittable<IProcessable> {
     }
 
     @Override
-    public boolean hasMore() {
+    public boolean hasNext() {
         return regress > 0;
     }
 
