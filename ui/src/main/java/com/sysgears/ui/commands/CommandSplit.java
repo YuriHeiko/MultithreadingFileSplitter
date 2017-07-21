@@ -15,6 +15,7 @@ import com.sysgears.statistic.ConcurrentRecordsHolder;
 import com.sysgears.statistic.IHolder;
 import com.sysgears.statistic.Watcher;
 import com.sysgears.ui.FileProcessor;
+import com.sysgears.ui.IExecutable;
 import com.sysgears.ui.ServiceRunner;
 import com.sysgears.ui.UIException;
 import javafx.util.Pair;
@@ -72,12 +73,9 @@ public class CommandSplit implements IExecutable {
 
     /**
      * Split a file into chunks
-     *
-     * @param jCommander The {@code JCommander} object
-     * @return The string with the command representation
      */
     @Override
-    public String execute(final JCommander jCommander) {
+    public void execute() {
         final long fileSize = new File(path).length();
         final IOHandler syncReadIO = new SyncReadIO();
         final ISplittable<IProcessable> fileSplitter = new FileSplitter(fileSize, path, convertToNumber(chunkSize), partPrefix, 0);
@@ -88,8 +86,6 @@ public class CommandSplit implements IExecutable {
         final ServiceRunner serviceRunner = new ServiceRunner(fileFactory, watcher, threadsNumber);
 
         serviceRunner.run();
-
-        return "split";
     }
 
     /**

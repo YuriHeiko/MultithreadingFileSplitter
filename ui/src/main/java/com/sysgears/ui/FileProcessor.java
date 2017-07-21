@@ -2,6 +2,8 @@ package com.sysgears.ui;
 
 import com.beust.jcommander.ParameterException;
 import com.sysgears.service.ServiceException;
+import com.sysgears.ui.commands.CommandExit;
+import com.sysgears.ui.commands.CommandHelp;
 
 import java.io.*;
 
@@ -67,15 +69,24 @@ public class FileProcessor {
      * Conducts dialogue with a user and performs their commands
      */
     public void run() {
-        String command = "";
         System.out.println("This program can split and join a file using multiple threads" + System.lineSeparator());
         CommandsHandler handler = new CommandsHandler();
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
-            while (!command.equals("exit")) {
+            while (true) {
                 System.out.println("Type a command or 'help' to see how to use the program:");
                 try {
-                    command = handler.handle(reader.readLine().split(" "));
+                    IExecutable command = handler.encode(reader.readLine().split(" "));
+
+                    if (command.getClass() == CommandExit.class) {
+                        System.exit(0);
+
+                    } else if (command.getClass() == CommandHelp.class) {
+                        handler.showCommandsUsage();
+
+                    } else {
+                        command.execute();
+                    }
 
                 } catch (ParameterException e) {
                     System.out.println(e.getMessage());

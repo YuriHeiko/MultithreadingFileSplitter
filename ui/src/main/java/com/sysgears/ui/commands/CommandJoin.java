@@ -4,6 +4,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.sysgears.ui.FileProcessor;
+import com.sysgears.ui.IExecutable;
 
 /**
  * A command to glue a parts into one file
@@ -39,13 +40,9 @@ public class CommandJoin implements IExecutable {
 
     /**
      * Joins parts of a file into a big one
-     *
-     * @param jCommander The {@code JCommander} object
-     * @return The string with the command representation
      */
     @Override
-    public String execute(final JCommander jCommander) {
-
-        return "join";
+    public void execute() {
+        System.out.println("join -p " + path);
     }
 }

@@ -1,7 +1,7 @@
 package com.sysgears.ui.commands;
 
-import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameters;
+import com.sysgears.ui.IExecutable;
 
 /**
  * A command to quit program
@@ -10,12 +10,9 @@ import com.beust.jcommander.Parameters;
 public class CommandExit implements IExecutable {
     /**
      * Shows help
-     *
-     * @param jCommander The {@code JCommander} object
-     * @return The string with the command representation
      */
     @Override
-    public String execute(final JCommander jCommander) {
-        return "exit";
+    public void execute() {
+        // do nothing
     }
 }
