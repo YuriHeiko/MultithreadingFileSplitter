@@ -11,6 +11,8 @@ public class FPRunner {
      * @param args The command line parameters
      */
     public static void main(String[] args) {
+        // split -p /home/yuri/Documents/test/idea.tar.gz -s 10MB -d 100 -t
+        // join -p /home/yuri/Documents/test/idea.tar.gz.part1 -d 100 -t
         new FileProcessor().run();
     }
 }

@@ -11,6 +11,7 @@ import com.sysgears.service.processor.processable.IProcessable;
 import com.sysgears.service.processor.splittable.FileSplitter;
 import com.sysgears.statistic.ConcurrentRecordsHolder;
 import com.sysgears.statistic.IHolder;
+import com.sysgears.statistic.StatisticHolder;
 import com.sysgears.statistic.Watcher;
 import com.sysgears.ui.FileProcessor;
 import com.sysgears.ui.IExecutable;
@@ -78,7 +79,7 @@ public class CommandSplit implements IExecutable {
         final long fileSize = new File(path).length();
         final IOHandler syncReadIO = new SyncReadIO();
         final Iterator<IProcessable> fileSplitter = new FileSplitter(fileSize, path, convertToNumber(chunkSize), partPrefix, 0);
-        final IHolder<Long, Pair<Long, Long>> holder = new ConcurrentRecordsHolder<>();
+        final StatisticHolder<Long, Pair<Long, Long>> holder = new ConcurrentRecordsHolder<>();
         final Watcher<Long, Pair<Long, Long>> watcher = new Watcher<>(holder, fileSize, delay);
         final IProcessableProcessor processor = new IOProcessor(syncReadIO, holder, bufferSize);
         final FileWorkerFactory fileWorkerFactory = new FileWorkerFactory(fileSplitter, processor);

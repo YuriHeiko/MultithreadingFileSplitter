@@ -31,9 +31,9 @@ public class FileJoiner implements Iterator<IProcessable> {
         this.iterator = new FileIterator(fileSize, chunkSize);
 
         try {
-            source = new RandomAccessFile(fileName, "rw");
+            source = new RandomAccessFile(this.fileName, "rw");
         } catch (FileNotFoundException e) {
-            throw new ServiceException(fileName + " doesn't exist.");
+            throw new ServiceException(this.fileName + " doesn't exist.");
         }
     }
 
