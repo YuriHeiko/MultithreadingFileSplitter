@@ -6,7 +6,7 @@ import com.sysgears.service.processor.processable.FileChunk;
 import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
 
-public class FileJoiner extends AbstractFileHandler {
+public class FileJoiner {
     private final String fileName;
     private final String partPrefix;
     private final RandomAccessFile destination;
@@ -18,7 +18,6 @@ public class FileJoiner extends AbstractFileHandler {
                         final long chunkSize,
                         final String partPrefix,
                         final int partNumber) {
-        super(fileSize, chunkSize);
         this.fileName = fileName;
         this.partPrefix = partPrefix;
         this.partNumber = partNumber;
@@ -29,10 +28,9 @@ public class FileJoiner extends AbstractFileHandler {
             throw new ServiceException(fileName + " doesn't exist.");
         }
 
-        regress = fileSize;
+//        regress = fileSize;
     }
 
-    @Override
     public FileChunk next() {
 
         return null;

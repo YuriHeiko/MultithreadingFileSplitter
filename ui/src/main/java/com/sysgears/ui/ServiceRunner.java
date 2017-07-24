@@ -1,6 +1,6 @@
 package com.sysgears.ui;
 
-import com.sysgears.service.FileFactory;
+import com.sysgears.service.FileWorkerFactory;
 import com.sysgears.service.FileWorker;
 import com.sysgears.statistic.Watcher;
 import javafx.util.Pair;
@@ -11,9 +11,9 @@ import java.util.concurrent.TimeUnit;
 
 public class ServiceRunner {
     /**
-     * The {@link FileFactory} to create a collection of chunks
+     * The {@link FileWorkerFactory} to create a collection of chunks
      */
-    private final FileFactory factory;
+    private final FileWorkerFactory factory;
     /**
      * The {@link Watcher} to collect and show statistic
      */
@@ -26,11 +26,11 @@ public class ServiceRunner {
     /**
      * Constructs an object
      *
-     * @param factory       The {@link FileFactory} to create a collection of chunks
+     * @param factory       The {@link FileWorkerFactory} to create a collection of chunks
      * @param watcher       The {@link Watcher} to collect and show statistic
      * @param threadsNumber The number of threads in the thread pool
      */
-    public ServiceRunner(final FileFactory factory,
+    public ServiceRunner(final FileWorkerFactory factory,
                          final Watcher<Long, Pair<Long, Long>> watcher,
                          final int threadsNumber) {
         this.factory = factory;

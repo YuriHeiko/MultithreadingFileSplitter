@@ -4,7 +4,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.sysgears.io.IOHandler;
 import com.sysgears.io.SyncReadIO;
-import com.sysgears.service.FileFactory;
+import com.sysgears.service.FileWorkerFactory;
 import com.sysgears.service.processor.IOProcessor;
 import com.sysgears.service.processor.IProcessableProcessor;
 import com.sysgears.service.processor.processable.IProcessable;
@@ -81,8 +81,8 @@ public class CommandSplit implements IExecutable {
         final IHolder<Long, Pair<Long, Long>> holder = new ConcurrentRecordsHolder<>();
         final Watcher<Long, Pair<Long, Long>> watcher = new Watcher<>(holder, fileSize, delay);
         final IProcessableProcessor processor = new IOProcessor(syncReadIO, holder, bufferSize);
-        final FileFactory fileFactory = new FileFactory(fileSplitter, processor);
-        final ServiceRunner serviceRunner = new ServiceRunner(fileFactory, watcher, threadsNumber);
+        final FileWorkerFactory fileWorkerFactory = new FileWorkerFactory(fileSplitter, processor);
+        final ServiceRunner serviceRunner = new ServiceRunner(fileWorkerFactory, watcher, threadsNumber);
 
         serviceRunner.run();
     }

@@ -3,6 +3,7 @@ package com.sysgears.statistic;
 
 import javafx.util.Pair;
 import java.util.Map;
+import java.util.Set;
 
 public class Watcher<T, U extends Pair<Long, Long>> implements Runnable {
 
@@ -25,13 +26,18 @@ public class Watcher<T, U extends Pair<Long, Long>> implements Runnable {
         System.out.println("Total: estimating\tTime: estimating");
 
         while (regress > 0) {
-            for (Map.Entry<T, U> entry : holder.getAll().entrySet()) {
+            Set<Map.Entry<T, U>> set = holder.getAll().entrySet();
+            for (Map.Entry<T, U> entry : set) {
                 U pair = entry.getValue();
                 regress -= pair.getValue();
                 result.append("\tThread ").
                        append(entry.getKey()).
                        append(": ").
                        append(getPercent(pair.getKey(), pair.getValue()));
+            }
+
+            if (regress < 0) {
+                break;
             }
 
             result.append("\tTime remaining: ").
@@ -50,9 +56,11 @@ public class Watcher<T, U extends Pair<Long, Long>> implements Runnable {
             result.setLength(0);
         }
 
+/*
         if (regress < 0) {
             throw new StatisticException("The job has been overdone.");
         }
+*/
 
         System.out.println("-----------------------------");
         System.out.println("All the tasks have been done.");
