@@ -1,4 +1,4 @@
-package com.sysgears.service.processor.factory;
+package com.sysgears.service.processor.processable.factory;
 
 import com.sysgears.service.ServiceException;
 import com.sysgears.service.processor.processable.FileChunk;
