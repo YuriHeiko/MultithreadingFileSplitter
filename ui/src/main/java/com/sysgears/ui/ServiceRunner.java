@@ -1,7 +1,7 @@
 package com.sysgears.ui;
 
-import com.sysgears.service.FileWorkerFactory;
 import com.sysgears.service.FileWorker;
+import com.sysgears.service.FileWorkerFactory;
 import com.sysgears.statistic.Watcher;
 import javafx.util.Pair;
 import org.apache.log4j.Logger;

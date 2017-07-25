@@ -1,7 +1,5 @@
 package com.sysgears.ui;
 
-import com.beust.jcommander.JCommander;
-
 /**
  * The commands' interface
  */

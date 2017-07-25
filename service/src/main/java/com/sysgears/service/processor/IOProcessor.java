@@ -7,9 +7,21 @@ import com.sysgears.statistic.IHolder;
 import javafx.util.Pair;
 import org.apache.log4j.Logger;
 
+/**
+ * Processes the {@code IProcessable} object
+ */
 public class IOProcessor implements IProcessableProcessor {
+    /**
+     * The {@code IOHandler} instance
+     */
     private final IOHandler io;
+    /**
+     * The {@code IHolder} instance
+     */
     private final IHolder<Long, Pair<Long, Long>> holder;
+    /**
+     * The buffer size
+     */
     private final int bufferSize;
     /**
      * Logger
@@ -19,9 +31,9 @@ public class IOProcessor implements IProcessableProcessor {
     /**
      * Creates an object
      *
-     * @param io
-     * @param holder
-     * @param bufferSize
+     * @param io         The {@code IOHandler} instance
+     * @param holder     The {@code IHolder} instance
+     * @param bufferSize The buffer size
      */
     public IOProcessor(final IOHandler io, final IHolder<Long, Pair<Long, Long>> holder, final int bufferSize) {
         this.io = io;
@@ -30,6 +42,12 @@ public class IOProcessor implements IProcessableProcessor {
         log.debug("a new object initialized");
     }
 
+    /**
+     * Processes the received {@code IProcessable} object
+     *
+     * @param processable The object to process
+     * @return true if everything is ok
+     */
     @Override
     public boolean process(final IProcessable processable) {
         final byte[] buffer = new byte[bufferSize];

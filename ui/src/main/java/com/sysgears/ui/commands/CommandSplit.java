@@ -8,10 +8,10 @@ import com.sysgears.io.SyncReadIO;
 import com.sysgears.service.FileWorkerFactory;
 import com.sysgears.service.processor.IOProcessor;
 import com.sysgears.service.processor.IProcessableProcessor;
-import com.sysgears.service.processor.processable.FileSplitFactory;
+import com.sysgears.service.processor.factory.FileChunkIterator;
+import com.sysgears.service.processor.factory.FileSplitFactory;
+import com.sysgears.service.processor.factory.IProcessableFactory;
 import com.sysgears.service.processor.processable.IProcessable;
-import com.sysgears.service.processor.processable.IProcessableFactory;
-import com.sysgears.service.processor.processable.FileChunkIterator;
 import com.sysgears.statistic.AbstractRecordsHolder;
 import com.sysgears.statistic.ConcurrentRecordsHolder;
 import com.sysgears.statistic.Watcher;
@@ -104,7 +104,7 @@ public class CommandSplit implements IExecutable {
 
         log.info("Creating " + FileChunkIterator.class.getSimpleName() + " object");
         final Iterator<IProcessable> fileSplitter = new FileChunkIterator(fileSize, path, convertToNumber(chunkSize),
-                                                                        partPrefix, startNumber, source, processableFactory);
+                                                                    partPrefix, startNumber, source, processableFactory);
 
         log.info("Creating statistic holder: " + ConcurrentRecordsHolder.class.getSimpleName() + " object");
         final AbstractRecordsHolder<Long, Pair<Long, Long>> holder = new ConcurrentRecordsHolder<>();
@@ -116,7 +116,7 @@ public class CommandSplit implements IExecutable {
         final IProcessableProcessor processor = new IOProcessor(syncReadIO, holder, bufferSize);
 
         log.info("Creating workers factory" + FileWorkerFactory.class.getSimpleName() + " object");
-        final FileWorkerFactory fileWorkerFactory = new FileWorkerFactory(fileSplitter, processor);
+        final FileWorkerFactory fileWorkerFactory = new FileWorkerFactory(processor, fileSplitter);
 
         log.info("Creating the execution service: " + ServiceRunner.class.getSimpleName() + " object");
         final ServiceRunner serviceRunner = new ServiceRunner(fileWorkerFactory, watcher, threadsNumber);

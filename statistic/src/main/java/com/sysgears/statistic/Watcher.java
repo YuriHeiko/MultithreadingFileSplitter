@@ -7,15 +7,38 @@ import org.apache.log4j.Logger;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Watches statistic kept in the {@link AbstractRecordsHolder} object
+ * and prints it to System console
+ *
+ * @param <T> The thread id
+ * @param <U> The record
+ */
 public class Watcher<T, U extends Pair<Long, Long>> implements Runnable {
+    /**
+     * The {@code AbstractRecordsHolder} object
+     */
     private final AbstractRecordsHolder<T, U> holder;
+    /**
+     * The final progress
+     */
     private final long finalProgress;
+    /**
+     * The output delay
+     */
     private final long outputDelay;
     /**
      * Logger
      */
     private final static Logger log = Logger.getLogger(Watcher.class);
 
+    /**
+     * Constructs an object
+     *
+     * @param holder        The {@code AbstractRecordsHolder} object
+     * @param finalProgress The final progress
+     * @param outputDelay   The output delay
+     */
     public Watcher(AbstractRecordsHolder<T, U> holder, long finalProgress, long outputDelay) {
         this.holder = holder;
         this.finalProgress = finalProgress;
@@ -23,6 +46,9 @@ public class Watcher<T, U extends Pair<Long, Long>> implements Runnable {
         log.debug("a new object initialized");
     }
 
+    /**
+     * Starts watching
+     */
     @Override
     public void run() {
         final long startTime = System.currentTimeMillis();
@@ -34,15 +60,15 @@ public class Watcher<T, U extends Pair<Long, Long>> implements Runnable {
             for (Map.Entry<T, U> entry : set) {
                 U pair = entry.getValue();
                 result.append("\tThread ").
-                       append(entry.getKey()).
-                       append(": ").
-                       append(getPercent(pair.getKey(), pair.getValue()));
+                        append(entry.getKey()).
+                        append(": ").
+                        append(getPercent(pair.getKey(), pair.getValue()));
             }
 
             result.append("\tTime remaining: ").
-                   append(timeRemaining(finalProgress, holder.getProgress(), startTime)).
-                   insert(0, getPercent(finalProgress, holder.getProgress())).
-                   insert(0, "Total: ");
+                    append(timeRemaining(finalProgress, holder.getProgress(), startTime)).
+                    insert(0, getPercent(finalProgress, holder.getProgress())).
+                    insert(0, "Total: ");
 
             log.debug("A new statistic message: " + result);
             System.out.println(result);
@@ -88,7 +114,7 @@ public class Watcher<T, U extends Pair<Long, Long>> implements Runnable {
      *
      * @return The string contains estimated time in seconds
      */
-    private String timeRemaining(final long total, final long done,final long startTime) {
+    private String timeRemaining(final long total, final long done, final long startTime) {
         String result = "estimating";
 
         if (done != 0) {
