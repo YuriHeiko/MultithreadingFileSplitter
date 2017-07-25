@@ -8,8 +8,10 @@ import com.sysgears.io.SyncReadIO;
 import com.sysgears.service.FileWorkerFactory;
 import com.sysgears.service.processor.IOProcessor;
 import com.sysgears.service.processor.IProcessableProcessor;
+import com.sysgears.service.processor.processable.FileSplitFactory;
 import com.sysgears.service.processor.processable.IProcessable;
-import com.sysgears.service.processor.splittable.FileSplitter;
+import com.sysgears.service.processor.processable.IProcessableFactory;
+import com.sysgears.service.processor.processable.FileChunkIterator;
 import com.sysgears.statistic.AbstractRecordsHolder;
 import com.sysgears.statistic.ConcurrentRecordsHolder;
 import com.sysgears.statistic.Watcher;
@@ -20,6 +22,8 @@ import javafx.util.Pair;
 import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.RandomAccessFile;
 import java.util.Iterator;
 
 /**
@@ -82,18 +86,38 @@ public class CommandSplit implements IExecutable {
     public void execute() {
         log.info("Starting a split command execution");
         final long fileSize = new File(path).length();
+        log.info("File: " + path + "The size of the file: " + fileSize);
+
         log.info("Creating IO handler: " + SyncReadIO.class.getSimpleName() + " object");
         final IOHandler syncReadIO = new SyncReadIO();
-        log.info("Creating " + FileSplitter.class.getSimpleName() + " object");
-        final Iterator<IProcessable> fileSplitter = new FileSplitter(fileSize, path, convertToNumber(chunkSize), partPrefix, 0);
+
+        log.debug("Trying to create a RandomAccessFile, file name: " + path);
+        RandomAccessFile source;
+        try {
+            source = new RandomAccessFile(path, "rw");
+        } catch (FileNotFoundException e) {
+            throw new ParameterException(path + " doesn't exist.");
+        }
+
+        log.info("Creating " + IProcessableFactory.class.getSimpleName() + " object");
+        IProcessableFactory processableFactory = new FileSplitFactory();
+
+        log.info("Creating " + FileChunkIterator.class.getSimpleName() + " object");
+        final Iterator<IProcessable> fileSplitter = new FileChunkIterator(fileSize, path, convertToNumber(chunkSize),
+                                                                        partPrefix, startNumber, source, processableFactory);
+
         log.info("Creating statistic holder: " + ConcurrentRecordsHolder.class.getSimpleName() + " object");
         final AbstractRecordsHolder<Long, Pair<Long, Long>> holder = new ConcurrentRecordsHolder<>();
+
         log.info("Creating statistic watcher: " + Watcher.class.getSimpleName() + " object");
         final Watcher<Long, Pair<Long, Long>> watcher = new Watcher<>(holder, fileSize, delay);
+
         log.info("Creating processor: " + IOProcessor.class.getSimpleName() + " object");
         final IProcessableProcessor processor = new IOProcessor(syncReadIO, holder, bufferSize);
+
         log.info("Creating workers factory" + FileWorkerFactory.class.getSimpleName() + " object");
         final FileWorkerFactory fileWorkerFactory = new FileWorkerFactory(fileSplitter, processor);
+
         log.info("Creating the execution service: " + ServiceRunner.class.getSimpleName() + " object");
         final ServiceRunner serviceRunner = new ServiceRunner(fileWorkerFactory, watcher, threadsNumber);
 
@@ -139,6 +163,11 @@ public class CommandSplit implements IExecutable {
         return chunkSize;
     }
 
+    /**
+     * Builds a string representation of this
+     *
+     * @return The string representation of this
+     */
     @Override
     public String toString() {
         return "CommandSplit{" +

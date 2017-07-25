@@ -1,10 +1,10 @@
-package com.sysgears.service.processor.splittable;
+package com.sysgears.service.processor.processable;
 
 import org.apache.log4j.Logger;
 
 import java.util.Iterator;
 
-public class FileIterator implements Iterator<Long> {
+public class FilePointerIterator implements Iterator<Long> {
     private final long fileSize;
     private final long chunkSize;
 
@@ -13,9 +13,9 @@ public class FileIterator implements Iterator<Long> {
     /**
      * Logger
      */
-    private final static Logger log = Logger.getLogger(FileIterator.class);
+    private final static Logger log = Logger.getLogger(FilePointerIterator.class);
 
-    public FileIterator(final long fileSize, final long chunkSize) {
+    public FilePointerIterator(final long fileSize, final long chunkSize) {
         this.fileSize = fileSize;
         this.chunkSize = chunkSize;
 

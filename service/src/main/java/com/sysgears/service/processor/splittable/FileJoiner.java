@@ -2,7 +2,9 @@ package com.sysgears.service.processor.splittable;
 
 import com.sysgears.service.ServiceException;
 import com.sysgears.service.processor.processable.FileChunk;
+import com.sysgears.service.processor.processable.FilePointerIterator;
 import com.sysgears.service.processor.processable.IProcessable;
+import com.sysgears.service.processor.processable.IProcessableFactory;
 import org.apache.log4j.Logger;
 
 import java.io.FileNotFoundException;
@@ -16,6 +18,7 @@ public class FileJoiner implements Iterator<IProcessable> {
     private final long fileSize;
     private final long chunkSize;
     private final Iterator<Long> iterator;
+    private final IProcessableFactory processableFactory;
 
     private int partNumber;
     /**
@@ -27,7 +30,8 @@ public class FileJoiner implements Iterator<IProcessable> {
                       final String fileName,
                       final long chunkSize,
                       final String partPrefix,
-                      final int partNumber) {
+                      final int partNumber,
+                      final IProcessableFactory processableFactory) {
 
         try {
             this.fileSize = fileSize;
@@ -35,7 +39,9 @@ public class FileJoiner implements Iterator<IProcessable> {
             this.chunkSize = chunkSize;
             this.partPrefix = partPrefix;
             this.partNumber = partNumber;
-            this.iterator = new FileIterator(fileSize, chunkSize);
+            this.iterator = new FilePointerIterator(fileSize, chunkSize);
+            this.processableFactory = processableFactory;
+            
         } catch (StringIndexOutOfBoundsException e) {
             log.error(fileName + " wrong file name.");
             throw new ServiceException(fileName + " wrong file name.");
@@ -58,7 +64,7 @@ public class FileJoiner implements Iterator<IProcessable> {
     }
 
     @Override
-    public FileChunk next() {
+    public IProcessable next() {
         RandomAccessFile destination;
 
         try {
@@ -72,6 +78,6 @@ public class FileJoiner implements Iterator<IProcessable> {
         long size = fileSize - offset > chunkSize ? chunkSize : fileSize - offset;
         
         log.debug("Creating a new " + FileChunk.class.getSimpleName() + " object");
-        return new FileChunk(destination, source, size, 0, offset);
+        return processableFactory.create(source, destination, size, offset);
     }
 }
