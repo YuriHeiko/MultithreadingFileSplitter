@@ -16,4 +16,9 @@ public class CommandHelp implements IExecutable {
     public void execute() {
         // do nothing
     }
+
+    @Override
+    public String toString() {
+        return "CommandHelp{}";
+    }
 }

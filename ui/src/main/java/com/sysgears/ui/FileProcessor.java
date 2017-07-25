@@ -1,9 +1,12 @@
 package com.sysgears.ui;
 
 import com.beust.jcommander.ParameterException;
+import com.sysgears.io.IOHandlerException;
 import com.sysgears.service.ServiceException;
+import com.sysgears.statistic.StatisticException;
 import com.sysgears.ui.commands.CommandExit;
 import com.sysgears.ui.commands.CommandHelp;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 
@@ -43,12 +46,18 @@ public class FileProcessor {
      * The default size of a chunk
      */
     public final static String CHUNK_SIZE = "10MB";
+    /**
+     * Logger
+     */
+    private final static Logger log = Logger.getLogger(FileProcessor.class);
 
     /**
      * Constructs an object with default console Input and
      * Output streams
      */
-    public FileProcessor() {}
+    public FileProcessor() {
+        log.info("File processor starts, default IO");
+    }
 
     /**
      * Constructs an object with received Input and Output
@@ -63,6 +72,8 @@ public class FileProcessor {
 
         System.setIn(is);
         System.setOut(new PrintStream(os));
+
+        log.info("File processor starts, IS: " + is + ", OS: " + os);
     }
 
     /**
@@ -70,39 +81,47 @@ public class FileProcessor {
      */
     public void run() {
         System.out.println("This program can split and join a file using multiple threads" + System.lineSeparator());
+        log.debug("Initialising the commands handler");
         CommandsHandler handler = new CommandsHandler();
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
             while (true) {
                 System.out.println("Type a command or 'help' to see how to use the program:");
                 try {
+                    log.info("Waiting for a user command");
                     IExecutable command = handler.encode(reader.readLine().split(" "));
+                    log.info("A user has entered next command: " + command);
 
                     if (command.getClass() == CommandExit.class) {
+                        log.info("Quit program");
                         System.exit(0);
 
                     } else if (command.getClass() == CommandHelp.class) {
+                        log.info("Show usage command");
                         handler.showCommandsUsage();
 
                     } else {
+                        log.info("Trying to execute a user command");
                         command.execute();
                     }
 
                 } catch (ParameterException e) {
                     System.out.println(e.getMessage());
                     System.out.println("You've entered the wrong command. Try again or type 'help':");
+                    log.info("A wrong command was entered: " + e.getMessage());
 
-                } catch (UIException | ServiceException e) {
-//                } catch (UIException | StatisticException | ServiceException | IOHandlerException e) {
-                    System.out.println(e.getMessage() + System.lineSeparator());
+                } catch (StatisticException | ServiceException | IOHandlerException e) {
+                    log.warn("A program error happened: " + e.getMessage());
                 }
             }
 
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
+            log.fatal("An unexpected error happened: " + e.getMessage());
 
         } finally {
             if (systemIS != null && systemOS != null) {
+                log.info("Releasing system streams");
                 System.setIn(systemIS);
                 System.setOut(new PrintStream(systemOS));
             }

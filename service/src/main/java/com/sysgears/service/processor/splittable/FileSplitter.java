@@ -3,6 +3,7 @@ package com.sysgears.service.processor.splittable;
 import com.sysgears.service.ServiceException;
 import com.sysgears.service.processor.processable.FileChunk;
 import com.sysgears.service.processor.processable.IProcessable;
+import org.apache.log4j.Logger;
 
 import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
@@ -17,6 +18,10 @@ public class FileSplitter implements Iterator<IProcessable> {
     private final Iterator<Long> iterator;
 
     private int partNumber;
+    /**
+     * Logger
+     */
+    private static Logger log = Logger.getLogger(FileSplitter.class);
 
     public FileSplitter(final long fileSize,
                         final String fileName,
@@ -33,8 +38,12 @@ public class FileSplitter implements Iterator<IProcessable> {
         try {
             source = new RandomAccessFile(fileName, "rw");
         } catch (FileNotFoundException e) {
-            throw new ServiceException(fileName + " doesn't exist.");
+            log.error(this.fileName + " doesn't exist.");
+            throw new ServiceException(this.fileName + " doesn't exist.");
         }
+
+        log.info("initialized." + " fileName: " + this.fileName + " | fileSize: " + fileSize + " | chunkSize: " +
+                chunkSize + " | prefix: " + partPrefix + " | starting number: " + partNumber);
     }
 
     @Override
@@ -49,12 +58,14 @@ public class FileSplitter implements Iterator<IProcessable> {
         try {
             destination = new RandomAccessFile(fileName + partPrefix + ++partNumber, "rw");
         } catch (FileNotFoundException e) {
+            log.error(fileName + partPrefix + ++partNumber + " wrong file name.");
             throw new ServiceException(fileName + partPrefix + ++partNumber + " wrong file name.");
         }
 
         long offset = iterator.next();
         long size = fileSize - offset > chunkSize ? chunkSize : fileSize - offset;
+
+        log.debug("Creating a new " + FileChunk.class.getSimpleName() + " object");
         return new FileChunk(source, destination, size, offset, 0);
-//        return new FileChunk(source, destination, fileSize, 0, iterator.next());
     }
 }

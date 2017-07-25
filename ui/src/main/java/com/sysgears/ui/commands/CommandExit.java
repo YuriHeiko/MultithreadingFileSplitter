@@ -15,4 +15,9 @@ public class CommandExit implements IExecutable {
     public void execute() {
         // do nothing
     }
+
+    @Override
+    public String toString() {
+        return "CommandExit{}";
+    }
 }

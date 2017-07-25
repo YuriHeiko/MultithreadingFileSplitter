@@ -1,5 +1,7 @@
 package com.sysgears.io;
 
+import org.apache.log4j.Logger;
+
 import java.io.RandomAccessFile;
 
 /**
@@ -7,6 +9,11 @@ import java.io.RandomAccessFile;
  * {@code RandomAccessFile} stream
  */
 public class SyncReadIO extends IOHandler {
+    /**
+     * Logger
+     */
+    private final static Logger log = Logger.getLogger(SyncReadIO.class);
+
     /**
      * Sets a {@link RandomAccessFile} pointer into {@code position} than
      * asynchronously writes buffer bytes starting from 0 and ending at
@@ -21,6 +28,7 @@ public class SyncReadIO extends IOHandler {
     @Override
     public void write(final RandomAccessFile raf, final byte[] buffer, final long position, final int length)
             throws IOHandlerException {
+        log.debug("Trying to write");
         super.write(raf, buffer, position, length);
     }
 
@@ -36,6 +44,7 @@ public class SyncReadIO extends IOHandler {
      */
     @Override
     public synchronized int read(final RandomAccessFile raf, byte[] buffer, final long position) throws IOHandlerException {
+        log.debug("Trying to synchronously read");
         return super.read(raf, buffer, position);
     }
 }

@@ -2,27 +2,32 @@ package com.sysgears.statistic;
 
 
 import javafx.util.Pair;
+import org.apache.log4j.Logger;
+
 import java.util.Map;
 import java.util.Set;
 
 public class Watcher<T, U extends Pair<Long, Long>> implements Runnable {
-
-    private final StatisticHolder<T, U> holder;
+    private final AbstractRecordsHolder<T, U> holder;
     private final long finalProgress;
     private final long outputDelay;
+    /**
+     * Logger
+     */
+    private final static Logger log = Logger.getLogger(Watcher.class);
 
-    public Watcher(StatisticHolder<T, U> holder, long finalProgress, long outputDelay) {
+    public Watcher(AbstractRecordsHolder<T, U> holder, long finalProgress, long outputDelay) {
         this.holder = holder;
         this.finalProgress = finalProgress;
         this.outputDelay = outputDelay;
+        log.debug("a new object initialized");
     }
 
     @Override
     public void run() {
         final long startTime = System.currentTimeMillis();
+        log.info("Started statistic watching");
         final StringBuilder result = new StringBuilder();
-
-//        System.out.println("Total: estimating\tTime: estimating");
 
         while (finalProgress > holder.getProgress()) {
             Set<Map.Entry<T, U>> set = holder.getAll().entrySet();
@@ -39,21 +44,23 @@ public class Watcher<T, U extends Pair<Long, Long>> implements Runnable {
                    insert(0, getPercent(finalProgress, holder.getProgress())).
                    insert(0, "Total: ");
 
+            log.debug("A new statistic message: " + result);
             System.out.println(result);
 
             try {
                 Thread.sleep(outputDelay);
             } catch (InterruptedException e) {
-                throw new StatisticException("Statistic thread has been suddenly interrupted.");
+                log.error("Statistic thread has been suddenly interrupted.");
             }
 
             result.setLength(0);
         }
 
         if (finalProgress - holder.getProgress() < 0) {
-            throw new StatisticException("The job has been overdone.");
+            log.warn("The job has been overdone. Final progress: " + finalProgress + " job progress: " + holder.getProgress());
         }
 
+        log.info("Statistic finished");
         System.out.println("Total: 100.00%\tTime remaining: 0s");
         System.out.println("-----------------------------");
         System.out.println("All the tasks have been done.");

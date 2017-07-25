@@ -1,5 +1,7 @@
 package com.sysgears.service.processor.processable;
 
+import org.apache.log4j.Logger;
+
 import java.io.RandomAccessFile;
 
 public class FileChunk implements IProcessable {
@@ -8,6 +10,10 @@ public class FileChunk implements IProcessable {
     private final long size;
     private final long sourceOffset;
     private final long destinationOffset;
+    /**
+     * Logger
+     */
+    private final static Logger log = Logger.getLogger(FileChunk.class);
 
     public FileChunk(final RandomAccessFile source,
                      final RandomAccessFile destination,
@@ -19,6 +25,7 @@ public class FileChunk implements IProcessable {
         this.size = size;
         this.sourceOffset = sourceOffset;
         this.destinationOffset = destinationOffset;
+        log.debug("A new object initialized " + this);
     }
 
     @Override
@@ -44,5 +51,13 @@ public class FileChunk implements IProcessable {
     @Override
     public long getSize() {
         return size;
+    }
+
+    @Override
+    public String toString() {
+        return "FileChunk{size=" + size +
+                ", sourceOffset=" + sourceOffset +
+                ", destinationOffset=" + destinationOffset +
+                '}';
     }
 }
