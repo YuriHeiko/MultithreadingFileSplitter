@@ -24,6 +24,8 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.util.Iterator;
 
 /**
@@ -32,7 +34,7 @@ import java.util.Iterator;
 @Parameters(commandNames = "split", commandDescription = "Break file into parts")
 public class CommandSplit implements IExecutable {
     /**
-     * The path to the first chunk
+     * The path to the file
      */
     @Parameter(names = "-p", required = true, description = "The absolute file path, i.e. '-p C:/DIR/file.example'")
     private String path;
@@ -62,7 +64,7 @@ public class CommandSplit implements IExecutable {
     @Parameter(names = "-n", description = "Part prefix name")
     private String partPrefix = FileProcessor.PART_PREFIX;
     /**
-     * The IO buffer size
+     * The IO read/write buffer size
      */
     @Parameter(names = "-b", description = "IO buffer size(bytes)")
     private int bufferSize = FileProcessor.BUFFER_SIZE;
@@ -78,6 +80,26 @@ public class CommandSplit implements IExecutable {
      * Logger
      */
     private final static Logger log = Logger.getLogger(CommandSplit.class);
+    /**
+     * The {@link FileSystem} instance
+     */
+    private final FileSystem fileSystem;
+
+    /**
+     * Constructs an object with the default file system
+     */
+    public CommandSplit() {
+        fileSystem = FileSystems.getDefault();
+    }
+
+    /**
+     * Constructs an object with the given file system
+     *
+     * @param fileSystem The {@code FileSystem}
+     */
+    public CommandSplit(FileSystem fileSystem) {
+        this.fileSystem = fileSystem;
+    }
 
     /**
      * Split a file into chunks
@@ -88,13 +110,13 @@ public class CommandSplit implements IExecutable {
         final long fileSize = new File(path).length();
         log.info("File: " + path + "The size of the file: " + fileSize);
 
-        log.info("Creating IO handler: " + SyncReadIO.class.getSimpleName() + " object");
+        log.info("Creating the IO handler: " + SyncReadIO.class.getSimpleName() + " object");
         final IOHandler syncReadIO = new SyncReadIO();
 
         log.debug("Trying to create a RandomAccessFile, file name: " + path);
         RandomAccessFile source;
         try {
-            source = new RandomAccessFile(path, "rw");
+            source = new RandomAccessFile(new File(fileSystem.getPath(path).toUri()), "rw");
         } catch (FileNotFoundException e) {
             throw new ParameterException(path + " doesn't exist.");
         }
@@ -106,16 +128,16 @@ public class CommandSplit implements IExecutable {
         final Iterator<IProcessable> fileSplitter = new FileChunkIterator(fileSize, path, convertToNumber(chunkSize),
                                                                     partPrefix, startNumber, source, processableFactory);
 
-        log.info("Creating statistic holder: " + ConcurrentRecordsHolder.class.getSimpleName() + " object");
+        log.info("Creating the statistic holder: " + ConcurrentRecordsHolder.class.getSimpleName() + " object");
         final AbstractRecordsHolder<Long, Pair<Long, Long>> holder = new ConcurrentRecordsHolder<>();
 
-        log.info("Creating statistic watcher: " + Watcher.class.getSimpleName() + " object");
+        log.info("Creating the statistic watcher: " + Watcher.class.getSimpleName() + " object");
         final Watcher<Long, Pair<Long, Long>> watcher = new Watcher<>(holder, fileSize, delay);
 
-        log.info("Creating processor: " + IOProcessor.class.getSimpleName() + " object");
+        log.info("Creating the IO processor: " + IOProcessor.class.getSimpleName() + " object");
         final IProcessableProcessor processor = new IOProcessor(syncReadIO, holder, bufferSize);
 
-        log.info("Creating workers factory" + FileWorkerFactory.class.getSimpleName() + " object");
+        log.info("Creating the workers factory" + FileWorkerFactory.class.getSimpleName() + " object");
         final FileWorkerFactory fileWorkerFactory = new FileWorkerFactory(processor, fileSplitter);
 
         log.info("Creating the execution service: " + ServiceRunner.class.getSimpleName() + " object");

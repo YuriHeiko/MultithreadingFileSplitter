@@ -24,6 +24,8 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.util.Iterator;
 
 /**
@@ -53,7 +55,7 @@ public class CommandJoin implements IExecutable {
     @Parameter(names = "-n", description = "Part prefix name")
     private String partPrefix = FileProcessor.PART_PREFIX;
     /**
-     * The IO buffer size
+     * The IO read/write buffer size
      */
     @Parameter(names = "-b", description = "IO buffer size(bytes)")
     private int bufferSize = FileProcessor.BUFFER_SIZE;
@@ -61,6 +63,26 @@ public class CommandJoin implements IExecutable {
      * Logger
      */
     private final static Logger log = Logger.getLogger(CommandJoin.class);
+    /**
+     * The {@link FileSystem} instance
+     */
+    private final FileSystem fileSystem;
+
+    /**
+     * Constructs an object with the default file system
+     */
+    public CommandJoin() {
+        fileSystem = FileSystems.getDefault();
+    }
+
+    /**
+     * Constructs an object with the given file system
+     *
+     * @param fileSystem The {@code FileSystem}
+     */
+    public CommandJoin(FileSystem fileSystem) {
+        this.fileSystem = fileSystem;
+    }
 
     /**
      * Joins parts of a file into a big one
@@ -78,13 +100,14 @@ public class CommandJoin implements IExecutable {
         final long fileSize = countFinalFileSize(path, joinedFileName, firstPartNumber);
         log.info("The joined file size: " + fileSize);
 
-        log.info("Creating IO handler: " + SyncWriteIO.class.getSimpleName() + " object");
+        log.info("Creating the IO handler: " + SyncWriteIO.class.getSimpleName() + " object");
         final IOHandler syncWriteIO = new SyncWriteIO();
 
         log.debug("Trying to create a RandomAccessFile, file name: " + joinedFileName);
         RandomAccessFile source;
         try {
-            source = new RandomAccessFile(joinedFileName, "rw");
+
+            source = new RandomAccessFile(new File(fileSystem.getPath(joinedFileName).toUri()), "rw");
         } catch (FileNotFoundException e) {
             throw new ParameterException(joinedFileName + " doesn't exist.");
         }
@@ -94,18 +117,18 @@ public class CommandJoin implements IExecutable {
 
         log.info("Creating " + FileChunkIterator.class.getSimpleName() + " object");
         final Iterator<IProcessable> fileJoiner = new FileChunkIterator(fileSize, joinedFileName, chunkSize, partPrefix,
-                                                                        firstPartNumber, source, processableFactory);
+                firstPartNumber, source, processableFactory);
 
-        log.info("Creating statistic holder: " + ConcurrentRecordsHolder.class.getSimpleName() + " object");
+        log.info("Creating the statistic holder: " + ConcurrentRecordsHolder.class.getSimpleName() + " object");
         final AbstractRecordsHolder<Long, Pair<Long, Long>> holder = new ConcurrentRecordsHolder<>();
 
-        log.info("Creating statistic watcher: " + Watcher.class.getSimpleName() + " object");
+        log.info("Creating the statistic watcher: " + Watcher.class.getSimpleName() + " object");
         final Watcher<Long, Pair<Long, Long>> watcher = new Watcher<>(holder, fileSize, delay);
 
-        log.info("Creating processor: " + IOProcessor.class.getSimpleName() + " object");
+        log.info("Creating the IO processor: " + IOProcessor.class.getSimpleName() + " object");
         final IProcessableProcessor processor = new IOProcessor(syncWriteIO, holder, bufferSize);
 
-        log.info("Creating workers factory" + FileWorkerFactory.class.getSimpleName() + " object");
+        log.info("Creating the workers factory" + FileWorkerFactory.class.getSimpleName() + " object");
         final FileWorkerFactory fileWorkerFactory = new FileWorkerFactory(processor, fileJoiner);
 
         log.info("Creating the execution service: " + ServiceRunner.class.getSimpleName() + " object");

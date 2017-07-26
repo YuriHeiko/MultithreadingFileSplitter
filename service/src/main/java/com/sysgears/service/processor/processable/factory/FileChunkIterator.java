@@ -5,8 +5,11 @@ import com.sysgears.service.processor.processable.FileChunk;
 import com.sysgears.service.processor.processable.IProcessable;
 import org.apache.log4j.Logger;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -42,6 +45,10 @@ public class FileChunkIterator implements Iterator<IProcessable> {
      * The {@link IProcessableFactory} instance
      */
     private final IProcessableFactory processableFactory;
+    /**
+     * The {@link FileSystem} instance
+     */
+    private final FileSystem fileSystem;
 
     /**
      * The next part number
@@ -70,6 +77,28 @@ public class FileChunkIterator implements Iterator<IProcessable> {
                              final int partNumber,
                              final RandomAccessFile source,
                              final IProcessableFactory processableFactory) {
+        this(fileSize, fileName, chunkSize, partPrefix, partNumber, source, processableFactory, FileSystems.getDefault());
+    }
+
+    /**
+     * Creates an object
+     *
+     * @param fileSize           The size of the file
+     * @param fileName           The name of the file
+     * @param chunkSize          The chunk size
+     * @param partPrefix         The part prefix
+     * @param partNumber         The first part number
+     * @param source             The {@code RandomAccessFile} object of the source file
+     * @param processableFactory The {@code IProcessableFactory} instance
+     */
+    public FileChunkIterator(final long fileSize,
+                             final String fileName,
+                             final long chunkSize,
+                             final String partPrefix,
+                             final int partNumber,
+                             final RandomAccessFile source,
+                             final IProcessableFactory processableFactory,
+                             final FileSystem fileSystem) {
         this.fileSize = fileSize;
         this.fileName = fileName;
         this.chunkSize = chunkSize;
@@ -78,6 +107,7 @@ public class FileChunkIterator implements Iterator<IProcessable> {
         this.iterator = new PointerIterator(fileSize, chunkSize);
         this.source = source;
         this.processableFactory = processableFactory;
+        this.fileSystem = fileSystem;
 
         log.info("initialized." + " fileName: " + this.fileName + " | fileSize: " + fileSize + " | chunkSize: " +
                 chunkSize + " | prefix: " + partPrefix + " | starting number: " + partNumber);
@@ -110,7 +140,8 @@ public class FileChunkIterator implements Iterator<IProcessable> {
         RandomAccessFile destination;
 
         try {
-            destination = new RandomAccessFile(fileName + partPrefix + partNumber++, "rw");
+            File file = new File(fileSystem.getPath(fileName + partPrefix + partNumber++).toUri());
+            destination = new RandomAccessFile(file, "rw");
         } catch (FileNotFoundException e) {
             log.error(fileName + partPrefix + partNumber + " wrong file name.");
             throw new ServiceException(fileName + partPrefix + partNumber + " wrong file name.");
