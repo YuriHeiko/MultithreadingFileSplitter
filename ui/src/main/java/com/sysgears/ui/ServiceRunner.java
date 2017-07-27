@@ -1,23 +1,21 @@
 package com.sysgears.ui;
 
-import com.sysgears.service.FileWorker;
-import com.sysgears.service.FileWorkerFactory;
+import com.sysgears.service.FileWorkersFactory;
 import com.sysgears.statistic.Watcher;
 import javafx.util.Pair;
 import org.apache.log4j.Logger;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
+import java.util.concurrent.*;
 
 /**
  * Runs a main File Processor service
  */
 public class ServiceRunner {
     /**
-     * The {@link FileWorkerFactory} to create a collection of chunks
+     * The {@link FileWorkersFactory} to create a collection of chunks
      */
-    private final FileWorkerFactory factory;
+    private final FileWorkersFactory factory;
     /**
      * The {@link Watcher} to collect and show statistic
      */
@@ -34,44 +32,55 @@ public class ServiceRunner {
     /**
      * Constructs an object
      *
-     * @param factory       The {@link FileWorkerFactory} to create a collection of chunks
+     * @param factory       The {@link FileWorkersFactory} to create a collection of chunks
      * @param watcher       The {@link Watcher} to collect and show statistic
      * @param threadsNumber The number of threads in the thread pool
      */
-    public ServiceRunner(final FileWorkerFactory factory,
+    public ServiceRunner(final FileWorkersFactory factory,
                          final Watcher<Long, Pair<Long, Long>> watcher,
                          final int threadsNumber) {
         this.factory = factory;
         this.watcher = watcher;
         this.threadsNumber = threadsNumber;
-        log.debug("object initialized");
+        log.debug("object initialized.");
     }
 
     /**
      * Starts service tasks
      */
     public void run() {
-        log.debug("Getting new thread pool");
-        ExecutorService service = Executors.newFixedThreadPool(threadsNumber + 1);
-        log.debug("Starting statistic watcher");
-        service.submit(watcher);
-
-        FileWorker fileWorker;
-
-        while ((fileWorker = factory.create()) != null) {
-            log.debug("A new worker was created");
-            service.submit(fileWorker);
-            log.debug("A new worker was submitted to pool");
-        }
-        log.debug("Service shutting down");
-        service.shutdown();
-
         try {
+            log.debug("Getting new thread pool.");
+            ExecutorService service = Executors.newFixedThreadPool(threadsNumber + 1);
+            log.debug("Starting statistic watcher.");
+            service.submit(watcher);
+
+            log.debug("Create and invoke workers.");
+            List<Future<String>> futures = service.invokeAll(factory.create());
+
+            service.shutdown();
+            log.debug("Waiting for service shutting down.");
             service.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+
+            for (Future<String> response : futures) {
+                try {
+                    String s = response.get();
+                    if (!s.isEmpty()) {
+                        System.out.println("An error has occurred during operations: " + s);
+                    }
+                } catch (CancellationException e) {
+                    log.error("A some thread work has been canceled: " + e.getMessage());
+                    throw new UIException("A some thread work has been canceled: " + e.getMessage());
+                } catch (Exception e) {
+                    log.error("An Exception was thrown: " + e.getMessage());
+                    throw new UIException("An Exception was thrown: " + e.getMessage());
+                }
+            }
         } catch (InterruptedException e) {
-            log.error("Service shutting down awaiting has been suddenly interrupted.");
+            log.error("Service shutting down awaiting has been suddenly interrupted: " + e.getMessage());
+            throw new UIException("Service shutting down awaiting has been suddenly interrupted. Work has been halted: " + e.getMessage());
         }
 
-        log.info("Service is shut down");
+        log.info("The work has been done successfully. Service is shut down.");
     }
 }

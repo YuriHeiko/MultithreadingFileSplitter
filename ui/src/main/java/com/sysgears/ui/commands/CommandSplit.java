@@ -5,14 +5,12 @@ import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import com.sysgears.io.IOHandler;
 import com.sysgears.io.SyncReadIO;
-import com.sysgears.service.FileWorkerFactory;
+import com.sysgears.service.FileWorkersFactory;
 import com.sysgears.service.processor.IOProcessor;
 import com.sysgears.service.processor.IProcessableProcessor;
-import com.sysgears.service.processor.processable.IProcessable;
 import com.sysgears.service.processor.processable.factory.FileChunkIterator;
 import com.sysgears.service.processor.processable.factory.FileSplitFactory;
 import com.sysgears.service.processor.processable.factory.IProcessableFactory;
-import com.sysgears.service.processor.processable.factory.PointerIterator;
 import com.sysgears.statistic.AbstractRecordsHolder;
 import com.sysgears.statistic.ConcurrentRecordsHolder;
 import com.sysgears.statistic.Watcher;
@@ -127,18 +125,8 @@ public class CommandSplit implements IExecutable {
         log.info("Creating " + IProcessableFactory.class.getSimpleName() + " object");
         IProcessableFactory processableFactory = new FileSplitFactory();
 
-        log.info("Creating pointer " + Iterator.class.getSimpleName() + " object");
-        final Iterator<Long> pointerIterator = new PointerIterator(fileSize, chunkSizeNumber);
-
         log.info("Creating " + FileChunkIterator.class.getSimpleName() + " object");
-        final Iterator<IProcessable> fileSplitter = new FileChunkIterator(fileSize,
-                                                                          path,
-                                                                          chunkSizeNumber,
-                                                                          pointerIterator,
-                                                                          partPrefix,
-                                                                          startNumber,
-                                                                          source,
-                                                                          processableFactory);
+        final Iterator<Pair<Long, Long>> fileSplitter = new FileChunkIterator(fileSize, chunkSizeNumber);
 
         log.info("Creating the statistic holder: " + ConcurrentRecordsHolder.class.getSimpleName() + " object");
         final AbstractRecordsHolder<Long, Pair<Long, Long>> holder = new ConcurrentRecordsHolder<>();
@@ -149,11 +137,17 @@ public class CommandSplit implements IExecutable {
         log.info("Creating the IO processor: " + IOProcessor.class.getSimpleName() + " object");
         final IProcessableProcessor processor = new IOProcessor(syncReadIO, holder, bufferSize);
 
-        log.info("Creating the workers factory" + FileWorkerFactory.class.getSimpleName() + " object");
-        final FileWorkerFactory fileWorkerFactory = new FileWorkerFactory(processor, fileSplitter);
+        log.info("Creating the workers factory" + FileWorkersFactory.class.getSimpleName() + " object");
+        final FileWorkersFactory fileWorkersFactory = new FileWorkersFactory(processor,
+                                                                             fileSplitter,
+                                                                             processableFactory,
+                                                                             path,
+                                                                             partPrefix,
+                                                                             startNumber,
+                                                                             source);
 
         log.info("Creating the execution service: " + ServiceRunner.class.getSimpleName() + " object");
-        final ServiceRunner serviceRunner = new ServiceRunner(fileWorkerFactory, watcher, threadsNumber);
+        final ServiceRunner serviceRunner = new ServiceRunner(fileWorkersFactory, watcher, threadsNumber);
 
         log.info("Running a service");
         serviceRunner.run();

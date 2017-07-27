@@ -110,8 +110,12 @@ public class FileProcessor {
                     System.out.println("You've entered the wrong command. Try again or type 'help':");
                     log.info("A wrong command was entered: " + e.getMessage());
 
-                } catch (StatisticException | ServiceException | IOHandlerException e) {
-                    log.warn("A program error happened: " + e.getMessage());
+                } catch (UIException e) {
+                    System.out.println();
+                    System.out.println("A program error happened: " + e.getMessage());
+                    System.out.println("*******************************************");
+                    System.out.println("* The resulting file(s) may be corrupted! *");
+                    System.out.println("*******************************************");
                 }
             }
 

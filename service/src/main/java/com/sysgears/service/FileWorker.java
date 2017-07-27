@@ -4,10 +4,12 @@ import com.sysgears.service.processor.IProcessableProcessor;
 import com.sysgears.service.processor.processable.IProcessable;
 import org.apache.log4j.Logger;
 
+import java.util.concurrent.Callable;
+
 /**
  * The worker to start processor work
  */
-public class FileWorker implements Runnable {
+public class FileWorker implements Callable<String> {
     /**
      * The {@code IProcessable} to process
      */
@@ -38,8 +40,15 @@ public class FileWorker implements Runnable {
      * Runs processing
      */
     @Override
-    public void run() {
+    public String call() {
+        String message = "";
         log.info("Start processing: " + processable.toString());
-        processor.process(processable);
+        try {
+            processor.process(processable);
+        } catch (Throwable e) {
+            message = e.getMessage();
+        }
+
+        return message;
     }
 }
