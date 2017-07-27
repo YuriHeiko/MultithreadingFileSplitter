@@ -12,6 +12,7 @@ import com.sysgears.service.processor.processable.IProcessable;
 import com.sysgears.service.processor.processable.factory.FileChunkIterator;
 import com.sysgears.service.processor.processable.factory.FileJoinFactory;
 import com.sysgears.service.processor.processable.factory.IProcessableFactory;
+import com.sysgears.service.processor.processable.factory.PointerIterator;
 import com.sysgears.statistic.AbstractRecordsHolder;
 import com.sysgears.statistic.ConcurrentRecordsHolder;
 import com.sysgears.statistic.Watcher;
@@ -115,9 +116,18 @@ public class CommandJoin implements IExecutable {
         log.info("Creating " + IProcessableFactory.class.getSimpleName() + " object");
         IProcessableFactory processableFactory = new FileJoinFactory();
 
+        log.info("Creating pointer " + Iterator.class.getSimpleName() + " object");
+        final Iterator<Long> pointerIterator = new PointerIterator(fileSize, chunkSize);
+
         log.info("Creating " + FileChunkIterator.class.getSimpleName() + " object");
-        final Iterator<IProcessable> fileJoiner = new FileChunkIterator(fileSize, joinedFileName, chunkSize, partPrefix,
-                firstPartNumber, source, processableFactory);
+        final Iterator<IProcessable> fileJoiner = new FileChunkIterator(fileSize,
+                                                                        joinedFileName,
+                                                                        chunkSize,
+                                                                        pointerIterator,
+                                                                        partPrefix,
+                                                                        firstPartNumber,
+                                                                        source,
+                                                                        processableFactory);
 
         log.info("Creating the statistic holder: " + ConcurrentRecordsHolder.class.getSimpleName() + " object");
         final AbstractRecordsHolder<Long, Pair<Long, Long>> holder = new ConcurrentRecordsHolder<>();

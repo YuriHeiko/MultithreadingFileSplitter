@@ -4,7 +4,14 @@
 You have to create an application for splitting a big file into parts. Splitting should use several threads. You should 
 foresee using the app algorithm for restoring the file back.
 
-**The description of app work**  
+*Optional*
+
+    - convert the project to a multi-module one
+    - add logging
+    - add unit and integration tests
+    - feel free to add some useful features
+
+**The description of the app work**  
 After running, a user inputs a command to start splitting - _split_, the path to the file, and a desirable size of 
 a chunk. The app shows the work progress (in total and by each thread) using next format:  
     

@@ -12,6 +12,7 @@ import com.sysgears.service.processor.processable.IProcessable;
 import com.sysgears.service.processor.processable.factory.FileChunkIterator;
 import com.sysgears.service.processor.processable.factory.FileSplitFactory;
 import com.sysgears.service.processor.processable.factory.IProcessableFactory;
+import com.sysgears.service.processor.processable.factory.PointerIterator;
 import com.sysgears.statistic.AbstractRecordsHolder;
 import com.sysgears.statistic.ConcurrentRecordsHolder;
 import com.sysgears.statistic.Watcher;
@@ -106,6 +107,8 @@ public class CommandSplit implements IExecutable {
      */
     @Override
     public void execute() {
+        final long chunkSizeNumber = convertToNumber(chunkSize);
+
         log.info("Starting a split command execution");
         final long fileSize = new File(path).length();
         log.info("File: " + path + "The size of the file: " + fileSize);
@@ -124,9 +127,18 @@ public class CommandSplit implements IExecutable {
         log.info("Creating " + IProcessableFactory.class.getSimpleName() + " object");
         IProcessableFactory processableFactory = new FileSplitFactory();
 
+        log.info("Creating pointer " + Iterator.class.getSimpleName() + " object");
+        final Iterator<Long> pointerIterator = new PointerIterator(fileSize, chunkSizeNumber);
+
         log.info("Creating " + FileChunkIterator.class.getSimpleName() + " object");
-        final Iterator<IProcessable> fileSplitter = new FileChunkIterator(fileSize, path, convertToNumber(chunkSize),
-                                                                    partPrefix, startNumber, source, processableFactory);
+        final Iterator<IProcessable> fileSplitter = new FileChunkIterator(fileSize,
+                                                                          path,
+                                                                          chunkSizeNumber,
+                                                                          pointerIterator,
+                                                                          partPrefix,
+                                                                          startNumber,
+                                                                          source,
+                                                                          processableFactory);
 
         log.info("Creating the statistic holder: " + ConcurrentRecordsHolder.class.getSimpleName() + " object");
         final AbstractRecordsHolder<Long, Pair<Long, Long>> holder = new ConcurrentRecordsHolder<>();

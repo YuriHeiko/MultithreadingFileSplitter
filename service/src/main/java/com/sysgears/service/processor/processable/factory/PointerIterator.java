@@ -32,7 +32,7 @@ public class PointerIterator implements Iterator<Long> {
      * @param totalSize The size of an object to iterate
      * @param chunkSize The size of one chunk
      */
-    PointerIterator(final long totalSize, final long chunkSize) {
+    public PointerIterator(final long totalSize, final long chunkSize) {
         this.totalSize = totalSize;
         this.chunkSize = chunkSize;
 

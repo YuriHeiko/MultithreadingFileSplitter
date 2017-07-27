@@ -40,7 +40,7 @@ public class FileChunkIterator implements Iterator<IProcessable> {
     /**
      * The {@link PointerIterator} instance
      */
-    private final Iterator<Long> iterator;
+    private final Iterator<Long> pointerIterator;
     /**
      * The {@link IProcessableFactory} instance
      */
@@ -73,11 +73,13 @@ public class FileChunkIterator implements Iterator<IProcessable> {
     public FileChunkIterator(final long fileSize,
                              final String fileName,
                              final long chunkSize,
+                             final Iterator<Long> pointerIterator,
                              final String partPrefix,
                              final int partNumber,
                              final RandomAccessFile source,
                              final IProcessableFactory processableFactory) {
-        this(fileSize, fileName, chunkSize, partPrefix, partNumber, source, processableFactory, FileSystems.getDefault());
+        this(fileSize, fileName, chunkSize, pointerIterator, partPrefix,
+                partNumber, source, processableFactory, FileSystems.getDefault());
     }
 
     /**
@@ -94,6 +96,7 @@ public class FileChunkIterator implements Iterator<IProcessable> {
     public FileChunkIterator(final long fileSize,
                              final String fileName,
                              final long chunkSize,
+                             final Iterator<Long> pointerIterator,
                              final String partPrefix,
                              final int partNumber,
                              final RandomAccessFile source,
@@ -104,13 +107,13 @@ public class FileChunkIterator implements Iterator<IProcessable> {
         this.chunkSize = chunkSize;
         this.partPrefix = partPrefix;
         this.partNumber = partNumber;
-        this.iterator = new PointerIterator(fileSize, chunkSize);
+        this.pointerIterator = pointerIterator;
         this.source = source;
         this.processableFactory = processableFactory;
         this.fileSystem = fileSystem;
 
-        log.info("initialized." + " fileName: " + this.fileName + " | fileSize: " + fileSize + " | chunkSize: " +
-                chunkSize + " | prefix: " + partPrefix + " | starting number: " + partNumber);
+        log.info("initialized." + " fileName: " + this.fileName + " | fileSize: " + fileSize +
+                " | chunkSize: " + chunkSize + " | prefix: " + partPrefix + " | starting number: " + partNumber);
     }
 
     /**
@@ -122,7 +125,7 @@ public class FileChunkIterator implements Iterator<IProcessable> {
      */
     @Override
     public boolean hasNext() {
-        return iterator.hasNext();
+        return pointerIterator.hasNext();
     }
 
     /**
@@ -138,7 +141,6 @@ public class FileChunkIterator implements Iterator<IProcessable> {
         }
 
         RandomAccessFile destination;
-
         try {
             File file = new File(fileSystem.getPath(fileName + partPrefix + partNumber++).toUri());
             destination = new RandomAccessFile(file, "rw");
@@ -147,7 +149,7 @@ public class FileChunkIterator implements Iterator<IProcessable> {
             throw new ServiceException(fileName + partPrefix + partNumber + " wrong file name.");
         }
 
-        long offset = iterator.next();
+        long offset = pointerIterator.next();
         long size = fileSize - offset > chunkSize ? chunkSize : fileSize - offset;
 
         log.debug("Creating a new " + FileChunk.class.getSimpleName() + " object");
