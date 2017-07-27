@@ -60,15 +60,15 @@ public class Watcher<T, U extends Pair<Long, Long>> implements Runnable {
             for (Map.Entry<T, U> entry : set) {
                 U pair = entry.getValue();
                 result.append("\tThread ").
-                        append(entry.getKey()).
-                        append(": ").
-                        append(getPercent(pair.getKey(), pair.getValue()));
+                       append(entry.getKey()).
+                       append(": ").
+                       append(getPercent(pair.getKey(), pair.getValue()));
             }
 
             result.append("\tTime remaining: ").
-                    append(timeRemaining(finalProgress, holder.getProgress(), startTime)).
-                    insert(0, getPercent(finalProgress, holder.getProgress())).
-                    insert(0, "Total: ");
+                   append(timeRemaining(finalProgress, holder.getProgress(), startTime)).
+                   insert(0, getPercent(finalProgress, holder.getProgress())).
+                   insert(0, "Total: ");
 
             log.debug("A new statistic message: " + result);
             System.out.println(result);

@@ -14,7 +14,7 @@ public interface IProcessableFactory {
      * @param source      The {@code RandomAccessFile} source
      * @param destination The {@code RandomAccessFile} destination
      * @param size        The size of the file
-     * @param offset      The offset of the file
+     * @param offset      The file pointer position
      * @return The {@code IProcessable} instance
      */
     IProcessable create(RandomAccessFile source, RandomAccessFile destination, long size, long offset);

@@ -66,8 +66,8 @@ public class PointerIterator implements Iterator<Long> {
         }
 
         long result = totalSize - regress;
-        regress -= regress > chunkSize ? chunkSize : this.regress;
         log.debug("next result: " + result);
+        regress -=  chunkSize;
 
         return result;
     }

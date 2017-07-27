@@ -93,7 +93,7 @@ public class FileChunkIterator implements Iterator<IProcessable> {
      * @param source             The {@code RandomAccessFile} object of the source file
      * @param processableFactory The {@code IProcessableFactory} instance
      */
-    public FileChunkIterator(final long fileSize,
+    FileChunkIterator(final long fileSize,
                              final String fileName,
                              final long chunkSize,
                              final Iterator<Long> pointerIterator,
@@ -149,10 +149,10 @@ public class FileChunkIterator implements Iterator<IProcessable> {
             throw new ServiceException(fileName + partPrefix + partNumber + " wrong file name.");
         }
 
-        long offset = pointerIterator.next();
-        long size = fileSize - offset > chunkSize ? chunkSize : fileSize - offset;
+        long pointer = pointerIterator.next();
+        long size = fileSize - (pointer > chunkSize ? chunkSize : fileSize - pointer);
 
         log.debug("Creating a new " + FileChunk.class.getSimpleName() + " object");
-        return processableFactory.create(source, destination, size, offset);
+        return processableFactory.create(source, destination, size, pointer);
     }
 }

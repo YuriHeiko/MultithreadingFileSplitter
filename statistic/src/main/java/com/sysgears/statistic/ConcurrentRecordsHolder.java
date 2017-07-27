@@ -29,7 +29,7 @@ public class ConcurrentRecordsHolder<T, U extends Pair<Long, Long>> extends Abst
      *
      * @param key   The thread id
      * @param value The record
-     * @return
+     * @return The previous value
      */
     public U add(T key, U value) {
         long prevValue = 0;
