@@ -27,7 +27,7 @@ public class FileWorkersFactory {
     /**
      * The {@code IProcessable} instance
      */
-    private final Iterator<Pair<Long, Long>> chunkIterator;
+    private final Iterator<Pair<Long, Long>> pointerIterator;
     /**
      * The {@link IProcessableFactory} instance
      */
@@ -61,7 +61,7 @@ public class FileWorkersFactory {
      * Creates an object
      *
      * @param processor          The {@code IProcessableProcessor} instance
-     * @param chunkIterator      The {@code IProcessable} instance
+     * @param pointerIterator      The {@code IProcessable} instance
      * @param processableFactory The {@code IProcessableFactory} instance
      * @param fileName           The name of the file
      * @param partPrefix         The part prefix
@@ -69,20 +69,20 @@ public class FileWorkersFactory {
      * @param source             The {@code RandomAccessFile} object of the source file
      */
     public FileWorkersFactory(IProcessableProcessor processor,
-                              Iterator<Pair<Long, Long>> chunkIterator,
+                              Iterator<Pair<Long, Long>> pointerIterator,
                               IProcessableFactory processableFactory,
                               String fileName,
                               String partPrefix,
                               final int partNumber,
                               RandomAccessFile source) {
-        this(processor, chunkIterator, processableFactory, fileName,
+        this(processor, pointerIterator, processableFactory, fileName,
                 partPrefix, partNumber, source, FileSystems.getDefault());
     }
     /**
      * Creates an object
      *
      * @param processor          The {@code IProcessableProcessor} instance
-     * @param chunkIterator      The {@code IProcessable} instance
+     * @param pointerIterator      The {@code IProcessable} instance
      * @param processableFactory The {@code IProcessableFactory} instance
      * @param fileName           The name of the file
      * @param partPrefix         The part prefix
@@ -90,7 +90,7 @@ public class FileWorkersFactory {
      * @param source             The {@code RandomAccessFile} object of the source file
      */
     public FileWorkersFactory(IProcessableProcessor processor,
-                              Iterator<Pair<Long, Long>> chunkIterator,
+                              Iterator<Pair<Long, Long>> pointerIterator,
                               IProcessableFactory processableFactory,
                               String fileName,
                               String partPrefix,
@@ -98,7 +98,7 @@ public class FileWorkersFactory {
                               RandomAccessFile source,
                               FileSystem fileSystem) {
         this.processor = processor;
-        this.chunkIterator = chunkIterator;
+        this.pointerIterator = pointerIterator;
         this.processableFactory = processableFactory;
         this.fileName = fileName;
         this.partPrefix = partPrefix;
@@ -118,8 +118,8 @@ public class FileWorkersFactory {
     public Collection<Callable<String>> create() {
         Collection<Callable<String>> workers = new ArrayList<>();
 
-        while (chunkIterator.hasNext()) {
-            Pair<Long, Long> p = chunkIterator.next();
+        while (pointerIterator.hasNext()) {
+            Pair<Long, Long> p = pointerIterator.next();
 
             RandomAccessFile destination;
             try {

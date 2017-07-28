@@ -8,7 +8,7 @@ import com.sysgears.io.SyncWriteIO;
 import com.sysgears.service.FileWorkersFactory;
 import com.sysgears.service.processor.IOProcessor;
 import com.sysgears.service.processor.IProcessableProcessor;
-import com.sysgears.service.processor.processable.factory.FileChunkIterator;
+import com.sysgears.service.processor.processable.factory.FilePointerIterator;
 import com.sysgears.service.processor.processable.factory.FileJoinFactory;
 import com.sysgears.service.processor.processable.factory.IProcessableFactory;
 import com.sysgears.statistic.AbstractRecordsHolder;
@@ -114,8 +114,8 @@ public class CommandJoin implements IExecutable {
         log.info("Creating " + IProcessableFactory.class.getSimpleName() + " object");
         IProcessableFactory processableFactory = new FileJoinFactory();
 
-        log.info("Creating " + FileChunkIterator.class.getSimpleName() + " object");
-        final Iterator<Pair<Long, Long>> fileJoiner = new FileChunkIterator(fileSize, chunkSize);
+        log.info("Creating " + FilePointerIterator.class.getSimpleName() + " object");
+        final Iterator<Pair<Long, Long>> fileJoiner = new FilePointerIterator(fileSize, chunkSize);
 
         log.info("Creating the statistic holder: " + ConcurrentRecordsHolder.class.getSimpleName() + " object");
         final AbstractRecordsHolder<Long, Pair<Long, Long>> holder = new ConcurrentRecordsHolder<>();

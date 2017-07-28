@@ -1,19 +1,15 @@
 package com.sysgears.service.processor.processable.factory;
 
-import com.sysgears.service.processor.processable.FileChunk;
 import javafx.util.Pair;
 import org.apache.log4j.Logger;
 
-import java.io.RandomAccessFile;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
  * Iterates over possible chunks of a file
  */
-public class FileChunkIterator implements Iterator<Pair<Long, Long>> {
+public class FilePointerIterator implements Iterator<Pair<Long, Long>> {
     /**
      * The size of the file
      */
@@ -29,7 +25,7 @@ public class FileChunkIterator implements Iterator<Pair<Long, Long>> {
     /**
      * Logger
      */
-    private static Logger log = Logger.getLogger(FileChunkIterator.class);
+    private static Logger log = Logger.getLogger(FilePointerIterator.class);
 
     /**
      * Creates an object
@@ -37,7 +33,7 @@ public class FileChunkIterator implements Iterator<Pair<Long, Long>> {
      * @param fileSize           The size of the file
      * @param chunkSize          The chunk size
      */
-    public FileChunkIterator(final long fileSize, final long chunkSize) {
+    public FilePointerIterator(final long fileSize, final long chunkSize) {
         this.fileSize = fileSize;
         this.chunkSize = chunkSize;
         regress = fileSize;
