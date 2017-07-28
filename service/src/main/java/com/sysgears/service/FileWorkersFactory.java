@@ -27,7 +27,7 @@ public class FileWorkersFactory {
     /**
      * The {@code IProcessable} instance
      */
-    private final Iterator<Pair<Long, Long>> pointerIterator;
+    private final Iterator<FilePointerIterator.Trinity> pointerIterator;
     /**
      * The {@link IProcessableFactory} instance
      */
@@ -49,10 +49,6 @@ public class FileWorkersFactory {
      */
     private final FileSystem fileSystem;
     /**
-     * The next part number
-     */
-    private int partNumber;
-    /**
      * Logger
      */
     private static Logger log = Logger.getLogger(FileWorkersFactory.class);
@@ -65,18 +61,16 @@ public class FileWorkersFactory {
      * @param processableFactory The {@code IProcessableFactory} instance
      * @param fileName           The name of the file
      * @param partPrefix         The part prefix
-     * @param partNumber         The first part number
      * @param source             The {@code RandomAccessFile} object of the source file
      */
-    public FileWorkersFactory(IProcessableProcessor processor,
-                              Iterator<Pair<Long, Long>> pointerIterator,
-                              IProcessableFactory processableFactory,
-                              String fileName,
-                              String partPrefix,
-                              final int partNumber,
-                              RandomAccessFile source) {
+    public FileWorkersFactory(final IProcessableProcessor processor,
+                              final Iterator<FilePointerIterator.Trinity> pointerIterator,
+                              final IProcessableFactory processableFactory,
+                              final String fileName,
+                              final String partPrefix,
+                              final RandomAccessFile source) {
         this(processor, pointerIterator, processableFactory, fileName,
-                partPrefix, partNumber, source, FileSystems.getDefault());
+                partPrefix, source, FileSystems.getDefault());
     }
     /**
      * Creates an object
@@ -86,28 +80,24 @@ public class FileWorkersFactory {
      * @param processableFactory The {@code IProcessableFactory} instance
      * @param fileName           The name of the file
      * @param partPrefix         The part prefix
-     * @param partNumber         The first part number
      * @param source             The {@code RandomAccessFile} object of the source file
      */
-    public FileWorkersFactory(IProcessableProcessor processor,
-                              Iterator<Pair<Long, Long>> pointerIterator,
-                              IProcessableFactory processableFactory,
-                              String fileName,
-                              String partPrefix,
-                              final int partNumber,
-                              RandomAccessFile source,
-                              FileSystem fileSystem) {
+    public FileWorkersFactory(final IProcessableProcessor processor,
+                              final Iterator<FilePointerIterator.Trinity> pointerIterator,
+                              final IProcessableFactory processableFactory,
+                              final String fileName,
+                              final String partPrefix,
+                              final RandomAccessFile source,
+                              final FileSystem fileSystem) {
         this.processor = processor;
         this.pointerIterator = pointerIterator;
         this.processableFactory = processableFactory;
         this.fileName = fileName;
         this.partPrefix = partPrefix;
-        this.partNumber = partNumber;
         this.source = source;
         this.fileSystem = fileSystem;
 
-        log.debug("a new object initialized: fileName: " + fileName + " | partPrefix: " + partPrefix +
-                  " | firstPartNumber: " + partNumber);
+        log.debug("a new object initialized: fileName: " + fileName + " | partPrefix: " + partPrefix);
     }
 
     /**
@@ -119,19 +109,19 @@ public class FileWorkersFactory {
         Collection<Callable<String>> workers = new ArrayList<>();
 
         while (pointerIterator.hasNext()) {
-            Pair<Long, Long> p = pointerIterator.next();
+            FilePointerIterator.Trinity next = pointerIterator.next();
 
             RandomAccessFile destination;
             try {
                 log.debug("Trying to create the next file.");
-                File file = new File(fileSystem.getPath(fileName + partPrefix + partNumber++).toUri());
+                File file = new File(fileSystem.getPath(fileName + partPrefix + next.getChunkNumber()).toUri());
                 destination = new RandomAccessFile(file, "rw");
             } catch (FileNotFoundException e) {
-                log.error(fileName + partPrefix + partNumber + " wrong file name.");
-                throw new ServiceException(fileName + partPrefix + partNumber + " wrong file name.");
+                log.error(fileName + partPrefix + next.getChunkNumber() + " wrong file name.");
+                throw new ServiceException(fileName + partPrefix + next.getChunkNumber() + " wrong file name.");
             }
             log.info("Creating the next file chunk.");
-            IProcessable nextChunk = processableFactory.create(source, destination, p.getKey(), p.getValue());
+            IProcessable nextChunk = processableFactory.create(source, destination, next.getSize(), next.getPointer());
 
             log.info("Creating the new file worker.");
             workers.add(new FileWorker(nextChunk, processor));

@@ -114,7 +114,7 @@ public class FileProcessor {
                     System.out.println();
                     System.out.println("A program error happened: " + e.getMessage());
                     System.out.println("*******************************************");
-                    System.out.println("* The resulting file(s) may be corrupted! *");
+                    System.out.println("* The resulting file(s) can be corrupted! *");
                     System.out.println("*******************************************");
                 }
             }

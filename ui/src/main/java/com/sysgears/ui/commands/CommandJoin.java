@@ -8,7 +8,7 @@ import com.sysgears.io.SyncWriteIO;
 import com.sysgears.service.FileWorkersFactory;
 import com.sysgears.service.processor.IOProcessor;
 import com.sysgears.service.processor.IProcessableProcessor;
-import com.sysgears.service.processor.processable.factory.FilePointerIterator;
+import com.sysgears.service.FilePointerIterator;
 import com.sysgears.service.processor.processable.factory.FileJoinFactory;
 import com.sysgears.service.processor.processable.factory.IProcessableFactory;
 import com.sysgears.statistic.AbstractRecordsHolder;
@@ -115,7 +115,9 @@ public class CommandJoin implements IExecutable {
         IProcessableFactory processableFactory = new FileJoinFactory();
 
         log.info("Creating " + FilePointerIterator.class.getSimpleName() + " object");
-        final Iterator<Pair<Long, Long>> fileJoiner = new FilePointerIterator(fileSize, chunkSize);
+        final Iterator<FilePointerIterator.Trinity> fileJoiner = new FilePointerIterator(fileSize,
+                                                                                         chunkSize,
+                                                                                         firstPartNumber);
 
         log.info("Creating the statistic holder: " + ConcurrentRecordsHolder.class.getSimpleName() + " object");
         final AbstractRecordsHolder<Long, Pair<Long, Long>> holder = new ConcurrentRecordsHolder<>();
@@ -132,7 +134,6 @@ public class CommandJoin implements IExecutable {
                                                                              processableFactory,
                                                                              joinedFileName,
                                                                              partPrefix,
-                                                                             firstPartNumber,
                                                                              source);
 
         log.info("Creating the execution service: " + ServiceRunner.class.getSimpleName() + " object");
