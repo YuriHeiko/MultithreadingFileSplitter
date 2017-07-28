@@ -64,8 +64,8 @@ public class IOProcessor implements IProcessableProcessor {
             }
             try {
                 io.write(processable.getDestination(), buffer, processable.getDestinationOffset() + progress, bytes);
-                log.debug("Written to destination offset: " + (processable.getDestinationOffset() + progress) +
-                        " bytes: " + bytes);
+                log.debug("Written to destination offset: " +
+                            (processable.getDestinationOffset() + progress) + " bytes: " + bytes);
             } catch (IOHandlerException e) {
                 log.error("Error during writing, destination: " + processable.toString());
             }
@@ -74,8 +74,8 @@ public class IOProcessor implements IProcessableProcessor {
             log.debug("Changing the statistic record");
             holder.add(Thread.currentThread().getId(), new Pair<>(size, progress));
         }
-
         log.info("finished processing" + processable.toString());
+
         return true;
     }
 }

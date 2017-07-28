@@ -1,7 +1,9 @@
 package com.sysgears.service.processor.processable;
 
+import com.sysgears.service.ServiceException;
 import org.apache.log4j.Logger;
 
+import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
@@ -13,7 +15,7 @@ public class FileChunk implements IProcessable {
      */
     private final RandomAccessFile source;
     /**
-     * The {@link RandomAccessFile} destination
+     * The {@code RandomAccessFile} destination
      */
     private final RandomAccessFile destination;
     /**
@@ -36,23 +38,38 @@ public class FileChunk implements IProcessable {
     /**
      * Constructs an object
      *
-     * @param source            The {@code RandomAccessFile} source
-     * @param destination       The {@code RandomAccessFile} destination
+     * @param source            The source file name
+     * @param destination       The destination file name
      * @param size              The size of the source
      * @param sourceOffset      The source offset
      * @param destinationOffset The destination offset
      */
-    public FileChunk(final RandomAccessFile source,
-                     final RandomAccessFile destination,
+    public FileChunk(final String source,
+                     final String destination,
                      final long size,
                      final long sourceOffset,
                      final long destinationOffset) {
-        this.source = source;
-        this.destination = destination;
         this.size = size;
         this.sourceOffset = sourceOffset;
         this.destinationOffset = destinationOffset;
-        log.debug("A new object initialized " + this);
+
+        try {
+            log.debug("Trying to create the source file.");
+            this.source = new RandomAccessFile(source, "rw");
+        } catch (IOException e) {
+            log.error(source + " wrong file name.");
+            throw new ServiceException(source + " wrong file name.");
+        }
+
+        try {
+            log.debug("Trying to create the source file.");
+            this.destination = new RandomAccessFile(destination, "rw");
+        } catch (IOException e) {
+            log.error(source + " wrong file name.");
+            throw new ServiceException(source + " wrong file name.");
+        }
+
+        log.debug("A new object initialized. Source: " + source + " | Destination: " + destination + " | " + this);
     }
 
     /**

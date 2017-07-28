@@ -1,15 +1,6 @@
 package com.sysgears.service.processor.processable;
 
-import com.sysgears.service.ServiceException;
 import org.apache.log4j.Logger;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.file.FileSystem;
-import java.nio.file.Files;
-import java.nio.file.attribute.FileAttribute;
 
 /**
  * Contains chunk properties
@@ -24,13 +15,9 @@ public class ChunkProperties {
      */
     private final long pointer;
     /**
-     * The name of the file
+     * The file name
      */
     private final String fileName;
-    /**
-     * The chunk file
-     */
-    private final RandomAccessFile file;
     /**
      * Logger
      */
@@ -39,22 +26,14 @@ public class ChunkProperties {
     /**
      * Creates an object
      *
-     * @param size       The chunk size
-     * @param pointer    The chunk pointer
-     * @param fileSystem The {@code FileSystem}
+     * @param size     The chunk size
+     * @param pointer  The chunk pointer
+     * @param fileName The file name
      */
-    public ChunkProperties(final long size, final long pointer, final String fileName, final FileSystem fileSystem) {
+    public ChunkProperties(final long size, final long pointer, final String fileName) {
         this.size = size;
         this.pointer = pointer;
         this.fileName = fileName;
-
-        try {
-            log.debug("Trying to create the next chunk file.");
-            file = new RandomAccessFile(Files.createFile(fileSystem.getPath(fileName)).toFile(), "rw");
-        } catch (IOException e) {
-            log.error(fileName + " wrong file name.");
-            throw new ServiceException(fileName + " wrong file name.");
-        }
     }
 
     /**
@@ -76,12 +55,12 @@ public class ChunkProperties {
     }
 
     /**
-     * Returns the chunk file
+     * Returns the file name
      *
-     * @return the chunk file
+     * @return the file name
      */
-    public RandomAccessFile getFile() {
-        return file;
+    public String getFileName() {
+        return fileName;
     }
 
     /**
@@ -92,7 +71,7 @@ public class ChunkProperties {
      * argument; {@code false} otherwise.
      */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 

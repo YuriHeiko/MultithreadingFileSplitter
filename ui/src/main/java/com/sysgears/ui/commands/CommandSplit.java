@@ -122,6 +122,7 @@ public class CommandSplit implements IExecutable {
         log.info("Creating the IO handler: " + SyncReadIO.class.getSimpleName() + " object");
         final IOHandler syncReadIO = new SyncReadIO();
 
+/*
         log.debug("Trying to create a RandomAccessFile, file name: " + path);
         RandomAccessFile source;
         try {
@@ -130,15 +131,12 @@ public class CommandSplit implements IExecutable {
             throw new ParameterException(path + " doesn't exist.");
         }
 
+*/
         log.info("Creating " + IProcessableFactory.class.getSimpleName() + " object");
         IProcessableFactory processableFactory = new FileSplitFactory();
 
         log.info("Creating " + FileChunksSet.class.getSimpleName() + " object");
-        final Iterable<ChunkProperties> fileSplitter = new FileChunksSet(fileSize,
-                                                                        chunkSizeNumber,
-                                                                        startNumber,
-                                                                        path,
-                                                                        partPrefix);
+        final Iterable<ChunkProperties> chunksSet = new FileChunksSet(fileSize, chunkSizeNumber, startNumber, path, partPrefix);
 
         log.info("Creating the statistic holder: " + ConcurrentRecordsHolder.class.getSimpleName() + " object");
         final AbstractRecordsHolder<Long, Pair<Long, Long>> holder = new ConcurrentRecordsHolder<>();
@@ -150,7 +148,7 @@ public class CommandSplit implements IExecutable {
         final IProcessableProcessor processor = new IOProcessor(syncReadIO, holder, bufferSize);
 
         log.info("Creating the workers factory" + FileWorkersFactory.class.getSimpleName() + " object");
-        final FileWorkersFactory wFactory = new FileWorkersFactory(processor, fileSplitter, processableFactory, source);
+        final FileWorkersFactory wFactory = new FileWorkersFactory(processor, chunksSet, processableFactory, path);
 
         log.info("Creating the execution service: " + ServiceRunner.class.getSimpleName() + " object");
         final ServiceRunner serviceRunner = new ServiceRunner(wFactory, watcher, threadsNumber);

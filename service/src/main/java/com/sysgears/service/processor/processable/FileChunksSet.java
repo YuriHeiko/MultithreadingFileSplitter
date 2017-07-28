@@ -4,11 +4,6 @@ import com.sysgears.service.ServiceException;
 import javafx.util.Pair;
 import org.apache.log4j.Logger;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.RandomAccessFile;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -37,16 +32,12 @@ public class FileChunksSet implements Iterator<ChunkProperties>, Iterable<ChunkP
      */
     private final String fileName;
     /**
-     * The {@link FileSystem} instance
-     */
-    private final FileSystem fileSystem;
-    /**
      * Logger
      */
     private final static Logger log = Logger.getLogger(FileChunksSet.class);
 
     /**
-     * Creates an object with the default {@code FileSystem}
+     * Creates an object
      *
      * @param fileSize         The size of the file
      * @param chunkSize        The chunk size
@@ -59,25 +50,6 @@ public class FileChunksSet implements Iterator<ChunkProperties>, Iterable<ChunkP
                          final int firstChunkNumber,
                          final String fileName,
                          final String partPrefix) {
-        this(fileSize, chunkSize, firstChunkNumber, fileName, partPrefix, FileSystems.getDefault());
-    }
-
-    /**
-     * Creates an object
-     *
-     * @param fileSize         The size of the file
-     * @param chunkSize        The chunk size
-     * @param firstChunkNumber The first part number
-     * @param fileName         The name of the file
-     * @param partPrefix       The part prefix
-     * @param fileSystem       The {@code FileSystem}
-     */
-    public FileChunksSet(final long fileSize,
-                         final long chunkSize,
-                         final int firstChunkNumber,
-                         final String fileName,
-                         final String partPrefix,
-                         final FileSystem fileSystem) {
         if (fileSize <= 0 || chunkSize <= 0) {
             log.error("fileSize: " + fileSize + " | chunkSize: " + chunkSize);
             throw new ServiceException("The file and chunk size can be neither equal to 0 nor lesser than 0.");
@@ -89,7 +61,6 @@ public class FileChunksSet implements Iterator<ChunkProperties>, Iterable<ChunkP
         this.fileSize = fileSize;
         this.chunkSize = chunkSize;
         this.fileName = fileName + partPrefix;
-        this.fileSystem = fileSystem;
         chunkNumber = firstChunkNumber;
         regress = fileSize;
 
@@ -140,6 +111,6 @@ public class FileChunksSet implements Iterator<ChunkProperties>, Iterable<ChunkP
         regress -= chunkSize;
 
         log.debug("Returning a new " + Pair.class.getSimpleName() + " object with file properties");
-        return new ChunkProperties(size, pointer, fileName + chunkNumber++, fileSystem);
+        return new ChunkProperties(size, pointer, fileName + chunkNumber++);
     }
 }

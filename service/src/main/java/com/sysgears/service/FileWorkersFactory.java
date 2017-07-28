@@ -28,9 +28,9 @@ public class FileWorkersFactory {
      */
     private final IProcessableFactory processableFactory;
     /**
-     * The {@code RandomAccessFile} object of the source file
+     * The source file name
      */
-    private final RandomAccessFile source;
+    private final String source;
     /**
      * Logger
      */
@@ -42,12 +42,12 @@ public class FileWorkersFactory {
      * @param processor          The {@code IProcessableProcessor} instance
      * @param chunksProperties   The {@code IProcessable} instance
      * @param processableFactory The {@code IProcessableFactory} instance
-     * @param source             The {@code RandomAccessFile} object of the source file
+     * @param source             The source file name
      */
     public FileWorkersFactory(final IProcessableProcessor processor,
                               final Iterable<ChunkProperties> chunksProperties,
                               final IProcessableFactory processableFactory,
-                              final RandomAccessFile source) {
+                              final String source) {
         this.processor = processor;
         this.chunksProperties = chunksProperties;
         this.processableFactory = processableFactory;

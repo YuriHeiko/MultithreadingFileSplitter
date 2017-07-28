@@ -96,31 +96,20 @@ public class CommandJoin implements IExecutable {
         log.info("Chunk size: " + chunkSize);
         final int firstPartNumber = getFirstPartNumber(path);
         log.info("The first part number: " + firstPartNumber);
-        final String joinedFileName = getJoinedFileName(path);
-        log.info("The joined file name: " + joinedFileName);
-        final long fileSize = countFinalFileSize(path, joinedFileName, firstPartNumber);
+        final String joinedFile = getJoinedFileName(path);
+        log.info("The joined file name: " + joinedFile);
+        final long fileSize = countFinalFileSize(path, joinedFile, firstPartNumber);
         log.info("The joined file size: " + fileSize);
 
         log.info("Creating the IO handler: " + SyncWriteIO.class.getSimpleName() + " object");
         final IOHandler syncWriteIO = new SyncWriteIO();
 
-        log.debug("Trying to create a RandomAccessFile, file name: " + joinedFileName);
-        RandomAccessFile source;
-        try {
-            source = new RandomAccessFile(Files.createFile(fileSystem.getPath(joinedFileName)).toFile(), "rw");
-        } catch (IOException e) {
-            throw new ParameterException(joinedFileName + " doesn't exist.");
-        }
-
         log.info("Creating " + IProcessableFactory.class.getSimpleName() + " object");
         IProcessableFactory processableFactory = new FileJoinFactory();
 
         log.info("Creating " + FileChunksSet.class.getSimpleName() + " object");
-        final Iterable<ChunkProperties> fileJoiner = new FileChunksSet(fileSize,
-                                                                       chunkSize,
-                                                                       firstPartNumber,
-                                                                       joinedFileName,
-                                                                       partPrefix);
+        final Iterable<ChunkProperties> chunksSet = new FileChunksSet(fileSize, chunkSize, firstPartNumber,
+                                                                      joinedFile, partPrefix);
 
         log.info("Creating the statistic holder: " + ConcurrentRecordsHolder.class.getSimpleName() + " object");
         final AbstractRecordsHolder<Long, Pair<Long, Long>> holder = new ConcurrentRecordsHolder<>();
@@ -132,7 +121,7 @@ public class CommandJoin implements IExecutable {
         final IProcessableProcessor processor = new IOProcessor(syncWriteIO, holder, bufferSize);
 
         log.info("Creating the workers factory" + FileWorkersFactory.class.getSimpleName() + " object");
-        final FileWorkersFactory wFactory = new FileWorkersFactory(processor, fileJoiner, processableFactory, source);
+        final FileWorkersFactory wFactory = new FileWorkersFactory(processor, chunksSet, processableFactory, joinedFile);
 
         log.info("Creating the execution service: " + ServiceRunner.class.getSimpleName() + " object");
         final ServiceRunner serviceRunner = new ServiceRunner(wFactory, watcher, threadsNumber);
@@ -155,7 +144,6 @@ public class CommandJoin implements IExecutable {
         while ((file = new File(joinedFileName + partPrefix + number++)).exists() && file.isFile()) {
             size += file.length();
         }
-
 
         return size;
     }

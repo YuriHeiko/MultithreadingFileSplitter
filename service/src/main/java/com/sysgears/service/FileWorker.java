@@ -29,8 +29,7 @@ public class FileWorker implements Callable<String> {
      * @param processable The {@code IProcessable} to process
      * @param processor   The {@code IProcessableProcessor} to process
      */
-    FileWorker(final IProcessable processable,
-               final IProcessableProcessor processor) {
+    FileWorker(final IProcessable processable, final IProcessableProcessor processor) {
         this.processable = processable;
         this.processor = processor;
         log.debug("a new object initialized");
