@@ -1,7 +1,9 @@
 package com.sysgears.service.processor.processable.factory;
 
+import com.sysgears.service.processor.processable.ChunkProperties;
 import com.sysgears.service.processor.processable.FileChunk;
 import com.sysgears.service.processor.processable.IProcessable;
+import org.apache.log4j.Logger;
 
 import java.io.RandomAccessFile;
 
@@ -10,16 +12,19 @@ import java.io.RandomAccessFile;
  */
 public class FileJoinFactory implements IProcessableFactory {
     /**
+     * Logger
+     */
+    private final static Logger log = Logger.getLogger(FileJoinFactory.class);
+
+    /**
      * Creates {@code IProcessable} objects to join
      *
      * @param source      The {@code RandomAccessFile} source
-     * @param destination The {@code RandomAccessFile} destination
-     * @param size        The size of the file
-     * @param offset      The file pointer position
      * @return The {@code IProcessable} instance
      */
     @Override
-    public IProcessable create(RandomAccessFile source, RandomAccessFile destination, long size, long offset) {
-        return new FileChunk(destination, source, size, 0, offset);
+    public IProcessable create(RandomAccessFile source, ChunkProperties properties) {
+        log.debug("Create and return a new " + FileChunk.class + " object");
+        return new FileChunk(properties.getFile(), source, properties.getSize(), 0, properties.getPointer());
     }
 }

@@ -12,7 +12,7 @@ public abstract class IOHandler {
     /**
      * Logger
      */
-    private static Logger log = Logger.getLogger(IOHandler.class);
+    private final static Logger log = Logger.getLogger(IOHandler.class);
 
     /**
      * Sets a {@link RandomAccessFile} pointer into {@code position} than

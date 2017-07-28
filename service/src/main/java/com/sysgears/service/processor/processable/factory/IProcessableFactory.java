@@ -1,5 +1,6 @@
 package com.sysgears.service.processor.processable.factory;
 
+import com.sysgears.service.processor.processable.ChunkProperties;
 import com.sysgears.service.processor.processable.IProcessable;
 
 import java.io.RandomAccessFile;
@@ -12,10 +13,7 @@ public interface IProcessableFactory {
      * Creates {@code IProcessable} objects
      *
      * @param source      The {@code RandomAccessFile} source
-     * @param destination The {@code RandomAccessFile} destination
-     * @param size        The size of the file
-     * @param offset      The file pointer position
      * @return The {@code IProcessable} instance
      */
-    IProcessable create(RandomAccessFile source, RandomAccessFile destination, long size, long offset);
+    IProcessable create(RandomAccessFile source, ChunkProperties properties);
 }

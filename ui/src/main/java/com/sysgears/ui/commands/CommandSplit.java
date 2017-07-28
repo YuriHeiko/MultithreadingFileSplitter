@@ -5,10 +5,11 @@ import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import com.sysgears.io.IOHandler;
 import com.sysgears.io.SyncReadIO;
+import com.sysgears.service.processor.processable.ChunkProperties;
+import com.sysgears.service.processor.processable.FileChunksSet;
 import com.sysgears.service.FileWorkersFactory;
 import com.sysgears.service.processor.IOProcessor;
 import com.sysgears.service.processor.IProcessableProcessor;
-import com.sysgears.service.FilePointerIterator;
 import com.sysgears.service.processor.processable.factory.FileSplitFactory;
 import com.sysgears.service.processor.processable.factory.IProcessableFactory;
 import com.sysgears.statistic.AbstractRecordsHolder;
@@ -22,10 +23,11 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
-import java.util.Iterator;
+import java.nio.file.Files;
 
 /**
  * A command to split a file into chunks
@@ -114,7 +116,7 @@ public class CommandSplit implements IExecutable {
         if (chunkSizeNumber > fileSize) {
             log.debug("The wrong chunk size! Size can't exceed the size of the file");
             throw new ParameterException("The wrong chunk size! It can't exceed the size of the file. Chunk: " +
-                                        chunkSizeNumber + "bytes > " + fileSize + "bytes");
+                                         chunkSizeNumber + "bytes > " + fileSize + "bytes");
         }
 
         log.info("Creating the IO handler: " + SyncReadIO.class.getSimpleName() + " object");
@@ -123,18 +125,20 @@ public class CommandSplit implements IExecutable {
         log.debug("Trying to create a RandomAccessFile, file name: " + path);
         RandomAccessFile source;
         try {
-            source = new RandomAccessFile(new File(fileSystem.getPath(path).toUri()), "rw");
-        } catch (FileNotFoundException e) {
+            source = new RandomAccessFile(Files.createFile(fileSystem.getPath(path)).toFile(), "rw");
+        } catch (IOException e) {
             throw new ParameterException(path + " doesn't exist.");
         }
 
         log.info("Creating " + IProcessableFactory.class.getSimpleName() + " object");
         IProcessableFactory processableFactory = new FileSplitFactory();
 
-        log.info("Creating " + FilePointerIterator.class.getSimpleName() + " object");
-        final Iterator<FilePointerIterator.Trinity> fileSplitter = new FilePointerIterator(fileSize,
-                                                                                           chunkSizeNumber,
-                                                                                           startNumber);
+        log.info("Creating " + FileChunksSet.class.getSimpleName() + " object");
+        final Iterable<ChunkProperties> fileSplitter = new FileChunksSet(fileSize,
+                                                                        chunkSizeNumber,
+                                                                        startNumber,
+                                                                        path,
+                                                                        partPrefix);
 
         log.info("Creating the statistic holder: " + ConcurrentRecordsHolder.class.getSimpleName() + " object");
         final AbstractRecordsHolder<Long, Pair<Long, Long>> holder = new ConcurrentRecordsHolder<>();
@@ -146,15 +150,10 @@ public class CommandSplit implements IExecutable {
         final IProcessableProcessor processor = new IOProcessor(syncReadIO, holder, bufferSize);
 
         log.info("Creating the workers factory" + FileWorkersFactory.class.getSimpleName() + " object");
-        final FileWorkersFactory fileWorkersFactory = new FileWorkersFactory(processor,
-                                                                             fileSplitter,
-                                                                             processableFactory,
-                                                                             path,
-                                                                             partPrefix,
-                                                                             source);
+        final FileWorkersFactory wFactory = new FileWorkersFactory(processor, fileSplitter, processableFactory, source);
 
         log.info("Creating the execution service: " + ServiceRunner.class.getSimpleName() + " object");
-        final ServiceRunner serviceRunner = new ServiceRunner(fileWorkersFactory, watcher, threadsNumber);
+        final ServiceRunner serviceRunner = new ServiceRunner(wFactory, watcher, threadsNumber);
 
         log.info("Running a service");
         serviceRunner.run();
@@ -176,7 +175,7 @@ public class CommandSplit implements IExecutable {
             chunkSize = Long.valueOf(split[0]);
         } catch (NumberFormatException e) {
             throw new ParameterException("You've entered the wrong chunk size, it should be a positive number or " +
-                                        "it can have next format NUMBER" + BYTES_STRING);
+                                         "it can have next format NUMBER" + BYTES_STRING);
         }
 
         if (split.length > 1) {
@@ -192,7 +191,7 @@ public class CommandSplit implements IExecutable {
 
         if (chunkSize <= 0) {
             throw new ParameterException("You've entered the wrong chunk size, it must be a positive number greater " +
-                    "than 0");
+                                         "than 0");
         }
 
         return chunkSize;

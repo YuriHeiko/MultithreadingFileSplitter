@@ -1,15 +1,21 @@
-package com.sysgears.service;
+package com.sysgears.service.processor.processable;
 
+import com.sysgears.service.ServiceException;
 import javafx.util.Pair;
 import org.apache.log4j.Logger;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.RandomAccessFile;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * Iterates over possible chunks of a file
+ * Implements a set of file chunks of a file
  */
-public class FilePointerIterator implements Iterator<FilePointerIterator.Trinity> {
+public class FileChunksSet implements Iterator<ChunkProperties>, Iterable<ChunkProperties> {
     /**
      * The size of the file
      */
@@ -27,9 +33,34 @@ public class FilePointerIterator implements Iterator<FilePointerIterator.Trinity
      */
     private long regress;
     /**
+     * The name of the file
+     */
+    private final String fileName;
+    /**
+     * The {@link FileSystem} instance
+     */
+    private final FileSystem fileSystem;
+    /**
      * Logger
      */
-    private static Logger log = Logger.getLogger(FilePointerIterator.class);
+    private final static Logger log = Logger.getLogger(FileChunksSet.class);
+
+    /**
+     * Creates an object with the default {@code FileSystem}
+     *
+     * @param fileSize         The size of the file
+     * @param chunkSize        The chunk size
+     * @param firstChunkNumber The first part number
+     * @param fileName         The name of the file
+     * @param partPrefix       The part prefix
+     */
+    public FileChunksSet(final long fileSize,
+                         final long chunkSize,
+                         final int firstChunkNumber,
+                         final String fileName,
+                         final String partPrefix) {
+        this(fileSize, chunkSize, firstChunkNumber, fileName, partPrefix, FileSystems.getDefault());
+    }
 
     /**
      * Creates an object
@@ -37,8 +68,16 @@ public class FilePointerIterator implements Iterator<FilePointerIterator.Trinity
      * @param fileSize         The size of the file
      * @param chunkSize        The chunk size
      * @param firstChunkNumber The first part number
+     * @param fileName         The name of the file
+     * @param partPrefix       The part prefix
+     * @param fileSystem       The {@code FileSystem}
      */
-    public FilePointerIterator(final long fileSize, final long chunkSize, final int firstChunkNumber) {
+    public FileChunksSet(final long fileSize,
+                         final long chunkSize,
+                         final int firstChunkNumber,
+                         final String fileName,
+                         final String partPrefix,
+                         final FileSystem fileSystem) {
         if (fileSize <= 0 || chunkSize <= 0) {
             log.error("fileSize: " + fileSize + " | chunkSize: " + chunkSize);
             throw new ServiceException("The file and chunk size can be neither equal to 0 nor lesser than 0.");
@@ -49,11 +88,23 @@ public class FilePointerIterator implements Iterator<FilePointerIterator.Trinity
 
         this.fileSize = fileSize;
         this.chunkSize = chunkSize;
+        this.fileName = fileName + partPrefix;
+        this.fileSystem = fileSystem;
         chunkNumber = firstChunkNumber;
         regress = fileSize;
 
-        log.info("initialized." + " | fileSize: " + fileSize +
-                    " | chunkSize: " + chunkSize + " | firstChunkNumber: " + firstChunkNumber);
+        log.info("initialized." + " | fileSize: " + fileSize + " | fileName: " + fileName + " | partPrefix: " +
+                partPrefix + " | chunkSize: " + chunkSize + " | firstChunkNumber: " + firstChunkNumber);
+    }
+
+    /**
+     * Returns this as Iterator
+     *
+     * @return this
+     */
+    @Override
+    public Iterator<ChunkProperties> iterator() {
+        return this;
     }
 
     /**
@@ -76,7 +127,7 @@ public class FilePointerIterator implements Iterator<FilePointerIterator.Trinity
      * @throws NoSuchElementException if the iteration has no more elements
      */
     @Override
-    public Trinity next() {
+    public ChunkProperties next() {
         if (!hasNext()) {
             log.warn("Trying to iterate but there is no more elements");
             throw new NoSuchElementException("Trying to iterate but there is no more elements");
@@ -89,48 +140,6 @@ public class FilePointerIterator implements Iterator<FilePointerIterator.Trinity
         regress -= chunkSize;
 
         log.debug("Returning a new " + Pair.class.getSimpleName() + " object with file properties");
-        return new Trinity(size, pointer, chunkNumber++);
-    }
-
-    public class Trinity {
-        private final long size;
-        private final long pointer;
-        private final int chunkNumber;
-
-        public Trinity(long size, long pointer, int chunkNumber) {
-            this.size = size;
-            this.pointer = pointer;
-            this.chunkNumber = chunkNumber;
-        }
-
-        public long getSize() {
-            return size;
-        }
-
-        long getPointer() {
-            return pointer;
-        }
-
-        int getChunkNumber() {
-            return chunkNumber;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            Trinity trinity = (Trinity) o;
-
-            return size == trinity.size && pointer == trinity.pointer && chunkNumber == trinity.chunkNumber;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = (int) (size ^ (size >>> 32));
-            result = 31 * result + (int) (pointer ^ (pointer >>> 32));
-            result = 31 * result + chunkNumber;
-            return result;
-        }
+        return new ChunkProperties(size, pointer, fileName + chunkNumber++, fileSystem);
     }
 }

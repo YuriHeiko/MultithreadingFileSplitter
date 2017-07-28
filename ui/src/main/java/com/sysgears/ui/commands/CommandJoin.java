@@ -5,10 +5,11 @@ import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import com.sysgears.io.IOHandler;
 import com.sysgears.io.SyncWriteIO;
+import com.sysgears.service.processor.processable.ChunkProperties;
+import com.sysgears.service.processor.processable.FileChunksSet;
 import com.sysgears.service.FileWorkersFactory;
 import com.sysgears.service.processor.IOProcessor;
 import com.sysgears.service.processor.IProcessableProcessor;
-import com.sysgears.service.FilePointerIterator;
 import com.sysgears.service.processor.processable.factory.FileJoinFactory;
 import com.sysgears.service.processor.processable.factory.IProcessableFactory;
 import com.sysgears.statistic.AbstractRecordsHolder;
@@ -22,10 +23,11 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
-import java.util.Iterator;
+import java.nio.file.Files;
 
 /**
  * A command to glue a parts into one file
@@ -105,19 +107,20 @@ public class CommandJoin implements IExecutable {
         log.debug("Trying to create a RandomAccessFile, file name: " + joinedFileName);
         RandomAccessFile source;
         try {
-
-            source = new RandomAccessFile(new File(fileSystem.getPath(joinedFileName).toUri()), "rw");
-        } catch (FileNotFoundException e) {
+            source = new RandomAccessFile(Files.createFile(fileSystem.getPath(joinedFileName)).toFile(), "rw");
+        } catch (IOException e) {
             throw new ParameterException(joinedFileName + " doesn't exist.");
         }
 
         log.info("Creating " + IProcessableFactory.class.getSimpleName() + " object");
         IProcessableFactory processableFactory = new FileJoinFactory();
 
-        log.info("Creating " + FilePointerIterator.class.getSimpleName() + " object");
-        final Iterator<FilePointerIterator.Trinity> fileJoiner = new FilePointerIterator(fileSize,
-                                                                                         chunkSize,
-                                                                                         firstPartNumber);
+        log.info("Creating " + FileChunksSet.class.getSimpleName() + " object");
+        final Iterable<ChunkProperties> fileJoiner = new FileChunksSet(fileSize,
+                                                                       chunkSize,
+                                                                       firstPartNumber,
+                                                                       joinedFileName,
+                                                                       partPrefix);
 
         log.info("Creating the statistic holder: " + ConcurrentRecordsHolder.class.getSimpleName() + " object");
         final AbstractRecordsHolder<Long, Pair<Long, Long>> holder = new ConcurrentRecordsHolder<>();
@@ -129,15 +132,10 @@ public class CommandJoin implements IExecutable {
         final IProcessableProcessor processor = new IOProcessor(syncWriteIO, holder, bufferSize);
 
         log.info("Creating the workers factory" + FileWorkersFactory.class.getSimpleName() + " object");
-        final FileWorkersFactory fileWorkersFactory = new FileWorkersFactory(processor,
-                                                                             fileJoiner,
-                                                                             processableFactory,
-                                                                             joinedFileName,
-                                                                             partPrefix,
-                                                                             source);
+        final FileWorkersFactory wFactory = new FileWorkersFactory(processor, fileJoiner, processableFactory, source);
 
         log.info("Creating the execution service: " + ServiceRunner.class.getSimpleName() + " object");
-        final ServiceRunner serviceRunner = new ServiceRunner(fileWorkersFactory, watcher, threadsNumber);
+        final ServiceRunner serviceRunner = new ServiceRunner(wFactory, watcher, threadsNumber);
 
         log.info("Running a service");
         serviceRunner.run();

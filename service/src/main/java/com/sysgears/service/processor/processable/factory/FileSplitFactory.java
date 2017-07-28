@@ -1,7 +1,9 @@
 package com.sysgears.service.processor.processable.factory;
 
+import com.sysgears.service.processor.processable.ChunkProperties;
 import com.sysgears.service.processor.processable.FileChunk;
 import com.sysgears.service.processor.processable.IProcessable;
+import org.apache.log4j.Logger;
 
 import java.io.RandomAccessFile;
 
@@ -10,16 +12,18 @@ import java.io.RandomAccessFile;
  */
 public class FileSplitFactory implements IProcessableFactory {
     /**
+     * Logger
+     */
+    private final static Logger log = Logger.getLogger(FileSplitFactory.class);
+    /**
      * Creates {@code IProcessable} objects to split
      *
      * @param source      The {@code RandomAccessFile} source
-     * @param destination The {@code RandomAccessFile} destination
-     * @param size        The size of the file
-     * @param offset      The file pointer position
      * @return The {@code IProcessable} instance
      */
     @Override
-    public IProcessable create(RandomAccessFile source, RandomAccessFile destination, long size, long offset) {
-        return new FileChunk(source, destination, size, offset, 0);
+    public IProcessable create(RandomAccessFile source, ChunkProperties properties) {
+        log.debug("Create and return a new " + FileChunk.class + " object");
+        return new FileChunk(source, properties.getFile(), properties.getSize(), properties.getPointer(), 0);
     }
 }

@@ -21,7 +21,7 @@ public class FileWorker implements Callable<String> {
     /**
      * Logger
      */
-    private static Logger log = Logger.getLogger(FileWorker.class);
+    private final static Logger log = Logger.getLogger(FileWorker.class);
 
     /**
      * Creates an object
