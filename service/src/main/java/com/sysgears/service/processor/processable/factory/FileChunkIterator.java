@@ -40,6 +40,7 @@ public class FileChunkIterator implements Iterator<Pair<Long, Long>> {
     public FileChunkIterator(final long fileSize, final long chunkSize) {
         this.fileSize = fileSize;
         this.chunkSize = chunkSize;
+        regress = fileSize;
 
         log.info("initialized." + " | fileSize: " + fileSize + " | chunkSize: " + chunkSize);
     }
