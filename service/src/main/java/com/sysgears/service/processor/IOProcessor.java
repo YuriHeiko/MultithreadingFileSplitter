@@ -50,10 +50,10 @@ public class IOProcessor implements IProcessableProcessor {
      */
     @Override
     public boolean process(final IProcessable processable) {
-        final byte[] buffer = new byte[bufferSize];
+        final long size = processable.getSize();
+        final byte[] buffer = new byte[bufferSize > size ? (int) size : bufferSize];
         int bytes = 0;
         long progress = 0;
-        long size = processable.getSize();
 
         while (progress < size) {
             try {

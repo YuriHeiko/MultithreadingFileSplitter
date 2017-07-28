@@ -41,7 +41,7 @@ public class ConcurrentRecordsHolder<T, U extends Pair<Long, Long>> extends Abst
         long delta = value.getValue() - prevValue;
 
         log.debug("Changing the total progress");
-        if (delta < 0) {
+        if (delta <= 0) {
             changeProgress(value.getValue());
         } else {
             changeProgress(delta);

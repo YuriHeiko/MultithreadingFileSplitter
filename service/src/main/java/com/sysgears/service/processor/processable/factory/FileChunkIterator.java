@@ -72,13 +72,13 @@ public class FileChunkIterator implements Iterator<Pair<Long, Long>> {
         }
         long pointer = fileSize - regress;
         log.debug("next pointer: " + pointer);
-        long size = fileSize - (pointer > chunkSize ? chunkSize : regress);
+        long size = regress > chunkSize ? chunkSize : regress;
         log.debug("next chunk size: " + regress);
 
         regress -=  chunkSize;
 
         log.debug("Returning a new " + Pair.class.getSimpleName() + " object with file properties");
-        return new Pair<>(pointer, size);
+        return new Pair<>(size, pointer);
     }
 
 }
