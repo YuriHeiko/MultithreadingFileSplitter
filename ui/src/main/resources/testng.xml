@@ -4,7 +4,7 @@
     <suite name="UI">
         <test name="initTests">
             <classes>
-                <class name="com.sysgears.example.user.ITestStart"/>
+                <class name="com.sysgears.ui.commands.ITestCommands"/>
             </classes>
             <packages>
                 <package name="com.sysgears.example.user"/>

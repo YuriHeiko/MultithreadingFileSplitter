@@ -58,20 +58,22 @@ public class Viewer<T, U extends Pair<Long, Long>> implements Runnable {
             result.append("Total: ").append(getPercent(finalProgress, holder.getProgress()));
             for (Map.Entry<T, U> entry : holder.getAll().entrySet()) {
                 U pair = entry.getValue();
-                result.append("\tThread ").append(entry.getKey()).
-                        append(": ").
-                        append(getPercent(pair.getKey(), pair.getValue()));
+                result.append("\tThread ").
+                       append(entry.getKey()).
+                       append(": ").
+                       append(getPercent(pair.getKey(), pair.getValue()));
             }
             result.append("\tTime remaining: ").append(timeRemaining(finalProgress, holder.getProgress(), startTime));
+
             log.debug("A new statistical message: " + result + " was shown");
             System.out.println(result);
+            result.setLength(0);
 
             try {
                 Thread.sleep(outputDelay);
             } catch (InterruptedException e) {
-                log.warn("Attempt to interrupt the statistical thread.");
+                log.warn("An attempt to interrupt the statistical thread.");
             }
-            result.setLength(0);
         }
 
         if (finalProgress - holder.getProgress() < 0) {

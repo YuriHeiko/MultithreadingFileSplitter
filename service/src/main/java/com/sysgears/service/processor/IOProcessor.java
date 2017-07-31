@@ -39,7 +39,7 @@ public class IOProcessor implements IProcessableProcessor {
         this.io = io;
         this.holder = holder;
         this.bufferSize = bufferSize;
-        log.debug("a new object initialized");
+        log.debug("a new object initialized. bufferSize: " + bufferSize);
     }
 
     /**

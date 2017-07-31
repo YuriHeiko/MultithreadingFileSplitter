@@ -77,25 +77,32 @@ public class CommandSplit implements IExecutable {
      * Logger
      */
     private final static Logger log = Logger.getLogger(CommandSplit.class);
-    /**
-     * The {@link FileSystem} instance
-     */
-    private final FileSystem fileSystem;
 
     /**
-     * Constructs an object with the default file system
-     */
-    public CommandSplit() {
-        fileSystem = FileSystems.getDefault();
-    }
-
-    /**
-     * Constructs an object with the given file system
+     * Constructs an object
      *
-     * @param fileSystem The {@code FileSystem}
+     * @param path           The path to the file
+     * @param chunkSize      The size of a chunk
+     * @param threadsNumber  The number of threads
+     * @param startNumber    The first part number
+     * @param delay          The statistic output delay
+     * @param partPrefix     The part prefix name
+     * @param bufferSize     The IO read/write buffer size
      */
-    public CommandSplit(FileSystem fileSystem) {
-        this.fileSystem = fileSystem;
+    public CommandSplit(final String path,
+                        final String chunkSize,
+                        final int threadsNumber,
+                        final int startNumber,
+                        final int delay,
+                        final String partPrefix,
+                        final int bufferSize) {
+        this.path = path;
+        this.chunkSize = chunkSize;
+        this.threadsNumber = threadsNumber;
+        this.startNumber = startNumber;
+        this.delay = delay;
+        this.partPrefix = partPrefix;
+        this.bufferSize = bufferSize;
     }
 
     /**
@@ -118,21 +125,15 @@ public class CommandSplit implements IExecutable {
         log.info("Creating the IO handler: " + SyncReadIO.class.getSimpleName() + " object");
         final IOHandler syncReadIO = new SyncReadIO();
 
-/*
-        log.debug("Trying to create a RandomAccessFile, file name: " + path);
-        RandomAccessFile source;
-        try {
-            source = new RandomAccessFile(Files.createFile(fileSystem.getPath(path)).toFile(), "rw");
-        } catch (IOException e) {
-            throw new ParameterException(path + " doesn't exist.");
-        }
-
-*/
         log.info("Creating " + IProcessableFactory.class.getSimpleName() + " object");
         IProcessableFactory processableFactory = new FileSplitFactory();
 
         log.info("Creating " + FileChunksSet.class.getSimpleName() + " object");
-        final Iterable<ChunkProperties> chunksSet = new FileChunksSet(fileSize, chunkSizeNumber, startNumber, path, partPrefix);
+        final Iterable<ChunkProperties> chunksSet = new FileChunksSet(fileSize,
+                                                                      chunkSizeNumber,
+                                                                      startNumber,
+                                                                      path,
+                                                                      partPrefix);
 
         log.info("Creating the statistic holder: " + ConcurrentRecordsHolder.class.getSimpleName() + " object");
         final AbstractRecordsHolder<Long, Pair<Long, Long>> holder = new ConcurrentRecordsHolder<>();

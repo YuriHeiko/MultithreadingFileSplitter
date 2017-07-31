@@ -13,6 +13,11 @@
 
     <packaging>jar</packaging>
 
+    <properties>
+        <jcommander.version>1.72</jcommander.version>
+        <reflections.version>0.9.11</reflections.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.sysgears</groupId>
@@ -29,13 +34,13 @@
         <dependency>
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
-            <version>1.72</version>
+            <version>${jcommander.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
-            <version>0.9.11</version>
+            <version>${reflections.version}</version>
         </dependency>
     </dependencies>
 </project>
