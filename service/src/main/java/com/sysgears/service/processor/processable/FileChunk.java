@@ -43,12 +43,13 @@ public class FileChunk implements IProcessable {
      * @param size              The size of the source
      * @param sourceOffset      The source offset
      * @param destinationOffset The destination offset
+     * @throws ServiceException if an IO exception is occurred
      */
     public FileChunk(final String source,
                      final String destination,
                      final long size,
                      final long sourceOffset,
-                     final long destinationOffset) {
+                     final long destinationOffset) throws ServiceException {
         this.size = size;
         this.sourceOffset = sourceOffset;
         this.destinationOffset = destinationOffset;
@@ -122,8 +123,13 @@ public class FileChunk implements IProcessable {
         return size;
     }
 
+    /**
+     * Closes {@code RandomAccessFile} streams
+     *
+     * @throws ServiceException if an IO exception is occurred
+     */
     @Override
-    public void close() {
+    public void close() throws ServiceException {
         try {
             log.debug("Trying to close the source file.");
             source.close();

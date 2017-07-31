@@ -1,5 +1,8 @@
 package com.sysgears.service.processor.processable;
 
+import com.sysgears.service.ServiceException;
+
+import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
@@ -44,6 +47,8 @@ public interface IProcessable {
     /**
      * Closes IO streams and releases any system
      * resources associated with the streams.
+     *
+     * @throws ServiceException if an IO exception is occurred
      */
-    void close();
+    void close() throws ServiceException;
 }

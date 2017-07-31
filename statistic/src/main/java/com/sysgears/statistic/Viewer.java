@@ -5,7 +5,6 @@ import javafx.util.Pair;
 import org.apache.log4j.Logger;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Watches statistic kept in the {@link AbstractRecordsHolder} object
@@ -14,7 +13,7 @@ import java.util.Set;
  * @param <T> The thread id
  * @param <U> The record
  */
-public class Watcher<T, U extends Pair<Long, Long>> implements Runnable {
+public class Viewer<T, U extends Pair<Long, Long>> implements Runnable {
     /**
      * The {@code AbstractRecordsHolder} object
      */
@@ -30,7 +29,7 @@ public class Watcher<T, U extends Pair<Long, Long>> implements Runnable {
     /**
      * Logger
      */
-    private final static Logger log = Logger.getLogger(Watcher.class);
+    private final static Logger log = Logger.getLogger(Viewer.class);
 
     /**
      * Constructs an object
@@ -39,54 +38,48 @@ public class Watcher<T, U extends Pair<Long, Long>> implements Runnable {
      * @param finalProgress The final progress
      * @param outputDelay   The output delay
      */
-    public Watcher(AbstractRecordsHolder<T, U> holder, long finalProgress, long outputDelay) {
+    public Viewer(AbstractRecordsHolder<T, U> holder, long finalProgress, long outputDelay) {
         this.holder = holder;
         this.finalProgress = finalProgress;
         this.outputDelay = outputDelay;
-        log.debug("a new object initialized");
+        log.debug("a new object initialized. finalProgress: " + finalProgress + " | outputDelay: " + outputDelay);
     }
 
     /**
-     * Starts watching
+     * Starts viewing statistics
      */
     @Override
     public void run() {
+        log.info("Started statistical viewing");
         final long startTime = System.currentTimeMillis();
-        log.info("Started statistic watching");
         final StringBuilder result = new StringBuilder();
 
         while (finalProgress > holder.getProgress()) {
-            Set<Map.Entry<T, U>> set = holder.getAll().entrySet();
-            for (Map.Entry<T, U> entry : set) {
+            result.append("Total: ").append(getPercent(finalProgress, holder.getProgress()));
+            for (Map.Entry<T, U> entry : holder.getAll().entrySet()) {
                 U pair = entry.getValue();
-                result.append("\tThread ").
-                       append(entry.getKey()).
-                       append(": ").
-                       append(getPercent(pair.getKey(), pair.getValue()));
+                result.append("\tThread ").append(entry.getKey()).
+                        append(": ").
+                        append(getPercent(pair.getKey(), pair.getValue()));
             }
-
-            result.append("\tTime remaining: ").
-                   append(timeRemaining(finalProgress, holder.getProgress(), startTime)).
-                   insert(0, getPercent(finalProgress, holder.getProgress())).
-                   insert(0, "Total: ");
-
-            log.debug("A new statistic message: " + result);
+            result.append("\tTime remaining: ").append(timeRemaining(finalProgress, holder.getProgress(), startTime));
+            log.debug("A new statistical message: " + result + " was shown");
             System.out.println(result);
 
             try {
                 Thread.sleep(outputDelay);
             } catch (InterruptedException e) {
-                log.error("Statistic thread has been suddenly interrupted.");
+                log.warn("Attempt to interrupt the statistical thread.");
             }
-
             result.setLength(0);
         }
 
         if (finalProgress - holder.getProgress() < 0) {
-            log.warn("The job has been overdone. Final progress: " + finalProgress + " job progress: " + holder.getProgress());
+            log.warn("The job has been overdone. Final progress: " +
+                        finalProgress + " | Job progress: " + holder.getProgress());
         }
 
-        log.info("Statistic finished");
+        log.info("Statistical viewing finished");
         System.out.println("Total: 100.00%\tTime remaining: 0s");
         System.out.println("-----------------------------");
         System.out.println("All the tasks have been done.");

@@ -6,44 +6,42 @@ import com.sysgears.service.processor.processable.FileChunksSet;
 import org.easymock.EasyMockSupport;
 import org.testng.annotations.Test;
 
+import java.util.NoSuchElementException;
+
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 public class UTestFileChunksSet extends EasyMockSupport {
 
     @Test(expectedExceptions = ServiceException.class)
-    public void testHasNext1() throws Exception {
+    public void testHasNextChunkGreaterFile() throws Exception {
         new FileChunksSet(1, 2, 0, "", "").hasNext();
     }
 
     @Test(expectedExceptions = ServiceException.class)
-    public void testHasNext2() throws Exception {
+    public void testHasNextZeroChunkSize() throws Exception {
         new FileChunksSet(1, 0, 0, "", "").hasNext();
     }
 
     @Test(expectedExceptions = ServiceException.class)
-    public void testHasNext3() throws Exception {
-        new FileChunksSet(-1, 0, 0, "", "").hasNext();
+    public void testHasNextNegativeFileSize() throws Exception {
+        new FileChunksSet(-1, 1, 0, "", "").hasNext();
     }
 
-    @Test(expectedExceptions = ServiceException.class)
-    public void testNext4() throws Exception {
-        FileChunksSet iterator = new FileChunksSet(0, 0, 0, "", "");
+    @Test
+    public void testHasNextOk() throws Exception {
+        assertTrue(new FileChunksSet(1, 1, 0, "", "").hasNext());
+    }
+
+    @Test(expectedExceptions = NoSuchElementException.class)
+    public void testNextNoMoreElements() throws Exception {
+        FileChunksSet iterator = new FileChunksSet(2, 2, 0, "", "");
+        iterator.next();
         iterator.next();
     }
 
     @Test
-    public void testHasNext5() throws Exception {
-        assertTrue(new FileChunksSet(1, 1, 0, "", "").hasNext());
-    }
-
-    @Test
-    public void testHasNext6() throws Exception {
-        assertTrue(new FileChunksSet(2, 1, 0, "", "").hasNext());
-    }
-
-    @Test
-    public void testNext7() throws Exception {
+    public void testNextOk() throws Exception {
         FileChunksSet iterator = new FileChunksSet(6, 2, 0, "a", ".b");
 
         assertTrue(iterator.hasNext());

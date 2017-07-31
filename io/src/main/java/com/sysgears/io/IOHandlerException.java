@@ -10,7 +10,7 @@ public class IOHandlerException extends RuntimeException {
      *
      * @param message The string contains an error description
      */
-    public IOHandlerException(String message) {
+    IOHandlerException(String message) {
         super(message);
     }
 }

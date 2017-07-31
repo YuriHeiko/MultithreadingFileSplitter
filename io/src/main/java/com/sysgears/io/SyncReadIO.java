@@ -26,8 +26,10 @@ public class SyncReadIO extends IOHandler {
      * @throws IOHandlerException When {@code IOException} is arisen
      */
     @Override
-    public void write(final RandomAccessFile raf, final byte[] buffer, final long position, final int length)
-            throws IOHandlerException {
+    public void write(final RandomAccessFile raf,
+                      final byte[] buffer,
+                      final long position,
+                      final int length) throws IOHandlerException {
         log.debug("Trying to write");
         super.write(raf, buffer, position, length);
     }
@@ -43,7 +45,9 @@ public class SyncReadIO extends IOHandler {
      * @throws IOHandlerException When {@code IOException} is arisen
      */
     @Override
-    public synchronized int read(final RandomAccessFile raf, byte[] buffer, final long position) throws IOHandlerException {
+    public synchronized int read(final RandomAccessFile raf,
+                                 byte[] buffer,
+                                 final long position) throws IOHandlerException {
         log.debug("Trying to synchronously read");
         return super.read(raf, buffer, position);
     }

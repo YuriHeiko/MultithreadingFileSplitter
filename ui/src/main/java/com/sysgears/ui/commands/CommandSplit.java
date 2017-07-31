@@ -14,7 +14,7 @@ import com.sysgears.service.processor.processable.factory.FileSplitFactory;
 import com.sysgears.service.processor.processable.factory.IProcessableFactory;
 import com.sysgears.statistic.AbstractRecordsHolder;
 import com.sysgears.statistic.ConcurrentRecordsHolder;
-import com.sysgears.statistic.Watcher;
+import com.sysgears.statistic.Viewer;
 import com.sysgears.ui.FileProcessor;
 import com.sysgears.ui.IExecutable;
 import com.sysgears.ui.ServiceRunner;
@@ -137,8 +137,8 @@ public class CommandSplit implements IExecutable {
         log.info("Creating the statistic holder: " + ConcurrentRecordsHolder.class.getSimpleName() + " object");
         final AbstractRecordsHolder<Long, Pair<Long, Long>> holder = new ConcurrentRecordsHolder<>();
 
-        log.info("Creating the statistic watcher: " + Watcher.class.getSimpleName() + " object");
-        final Watcher<Long, Pair<Long, Long>> watcher = new Watcher<>(holder, fileSize, delay);
+        log.info("Creating the statistic viewer: " + Viewer.class.getSimpleName() + " object");
+        final Viewer<Long, Pair<Long, Long>> viewer = new Viewer<>(holder, fileSize, delay);
 
         log.info("Creating the IO processor: " + IOProcessor.class.getSimpleName() + " object");
         final IProcessableProcessor processor = new IOProcessor(syncReadIO, holder, bufferSize);
@@ -147,7 +147,7 @@ public class CommandSplit implements IExecutable {
         final FileWorkersFactory wFactory = new FileWorkersFactory(processor, chunksSet, processableFactory, path);
 
         log.info("Creating the execution service: " + ServiceRunner.class.getSimpleName() + " object");
-        final ServiceRunner serviceRunner = new ServiceRunner(wFactory, watcher, threadsNumber);
+        final ServiceRunner serviceRunner = new ServiceRunner(wFactory, viewer, threadsNumber);
 
         log.info("Running a service");
         serviceRunner.run();

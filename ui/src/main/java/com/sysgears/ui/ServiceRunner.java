@@ -1,7 +1,7 @@
 package com.sysgears.ui;
 
 import com.sysgears.service.FileWorkersFactory;
-import com.sysgears.statistic.Watcher;
+import com.sysgears.statistic.Viewer;
 import javafx.util.Pair;
 import org.apache.log4j.Logger;
 
@@ -17,9 +17,9 @@ public class ServiceRunner {
      */
     private final FileWorkersFactory factory;
     /**
-     * The {@link Watcher} to collect and show statistic
+     * The {@link Viewer} to collect and show statistic
      */
-    private final Watcher<Long, Pair<Long, Long>> watcher;
+    private final Viewer<Long, Pair<Long, Long>> viewer;
     /**
      * The number of threads in the thread pool
      */
@@ -33,14 +33,14 @@ public class ServiceRunner {
      * Constructs an object
      *
      * @param factory       The {@link FileWorkersFactory} to create a collection of chunks
-     * @param watcher       The {@link Watcher} to collect and show statistic
+     * @param viewer       The {@link Viewer} to show statistic
      * @param threadsNumber The number of threads in the thread pool
      */
     public ServiceRunner(final FileWorkersFactory factory,
-                         final Watcher<Long, Pair<Long, Long>> watcher,
+                         final Viewer<Long, Pair<Long, Long>> viewer,
                          final int threadsNumber) {
         this.factory = factory;
-        this.watcher = watcher;
+        this.viewer = viewer;
         this.threadsNumber = threadsNumber;
         log.debug("object initialized.");
     }
@@ -52,8 +52,8 @@ public class ServiceRunner {
         try {
             log.debug("Getting new thread pool.");
             ExecutorService service = Executors.newFixedThreadPool(threadsNumber + 1);
-            log.debug("Starting statistic watcher.");
-            service.submit(watcher);
+            log.debug("Starting statistic viewer.");
+            service.submit(viewer);
 
             log.debug("Create and invoke workers.");
             List<Future<String>> futures = service.invokeAll(factory.create());

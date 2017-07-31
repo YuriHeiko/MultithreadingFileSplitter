@@ -44,12 +44,16 @@ public class FileChunksSet implements Iterator<ChunkProperties>, Iterable<ChunkP
      * @param firstChunkNumber The first part number
      * @param fileName         The name of the file
      * @param partPrefix       The part prefix
+     * @throws ServiceException If {@code fileSize} or {@code chunkSize}
+     *                          are either lower or equal to zero
+     *                          If {@code chunkSize} is greater than {@code
+     *                          fileSize}
      */
     public FileChunksSet(final long fileSize,
                          final long chunkSize,
                          final int firstChunkNumber,
                          final String fileName,
-                         final String partPrefix) {
+                         final String partPrefix) throws ServiceException {
         if (fileSize <= 0 || chunkSize <= 0) {
             log.error("fileSize: " + fileSize + " | chunkSize: " + chunkSize);
             throw new ServiceException("The file and chunk size can be neither equal to 0 nor lesser than 0.");
@@ -65,7 +69,7 @@ public class FileChunksSet implements Iterator<ChunkProperties>, Iterable<ChunkP
         regress = fileSize;
 
         log.info("initialized." + " | fileSize: " + fileSize + " | fileName: " + fileName + " | partPrefix: " +
-                partPrefix + " | chunkSize: " + chunkSize + " | firstChunkNumber: " + firstChunkNumber);
+                 partPrefix + " | chunkSize: " + chunkSize + " | firstChunkNumber: " + firstChunkNumber);
     }
 
     /**
@@ -98,7 +102,7 @@ public class FileChunksSet implements Iterator<ChunkProperties>, Iterable<ChunkP
      * @throws NoSuchElementException if the iteration has no more elements
      */
     @Override
-    public ChunkProperties next() {
+    public ChunkProperties next() throws NoSuchElementException {
         if (!hasNext()) {
             log.warn("Trying to iterate but there is no more elements");
             throw new NoSuchElementException("Trying to iterate but there is no more elements");

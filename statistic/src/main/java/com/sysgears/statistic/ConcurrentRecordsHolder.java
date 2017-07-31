@@ -47,8 +47,8 @@ public class ConcurrentRecordsHolder<T, U extends Pair<Long, Long>> extends Abst
             changeProgress(delta);
         }
 
-        log.debug("a new record was added. Thread: " + key + " thread progress: " + value.getValue() +
-                ". Total progress: " + getProgress());
+        log.debug("a new record was added. Thread: " + key +
+                    " thread progress: " + value.getValue() + ". Total progress: " + getProgress());
         return prev;
     }
 
