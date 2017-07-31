@@ -14,6 +14,8 @@ public class FPRunner {
         // split -p /home/yuri/Documents/test/idea.tar.gz -s 10MB -d 100 -t
         // join -p /home/yuri/Documents/test/idea.tar.gz.part1 -d 100 -t
         // split -p d.zip -s 100MB -d 1000
+        // join -p d.zip.part1 -d 1000
+        // split -p r.md -s 400 -d 1000
         // split -p /home/yuri/Documents/test/r.md -s 100 -d 1000
         // join -p /home/yuri/Documents/test/r.md.part1
         new FileProcessor().run();

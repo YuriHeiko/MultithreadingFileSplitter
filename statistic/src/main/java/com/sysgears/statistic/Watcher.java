@@ -105,7 +105,7 @@ public class Watcher<T, U extends Pair<Long, Long>> implements Runnable {
         long t = (total == 0 ? 1 : total);
         double percent = done * 100.0 / t;
 
-        return Double.compare(percent, 100.0) == 0 ? "idle" : String.format("%.2f%%", percent);
+        return Double.compare(percent, 100.0) == 0 ? "idle\t" : String.format("%.2f%%", percent);
     }
 
     /**

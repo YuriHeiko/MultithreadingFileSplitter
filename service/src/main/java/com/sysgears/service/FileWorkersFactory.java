@@ -5,7 +5,6 @@ import com.sysgears.service.processor.processable.ChunkProperties;
 import com.sysgears.service.processor.processable.factory.IProcessableFactory;
 import org.apache.log4j.Logger;
 
-import java.io.RandomAccessFile;
 import java.util.Collection;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;

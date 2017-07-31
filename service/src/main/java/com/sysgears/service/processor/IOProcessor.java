@@ -74,6 +74,7 @@ public class IOProcessor implements IProcessableProcessor {
             log.debug("Changing the statistic record");
             holder.add(Thread.currentThread().getId(), new Pair<>(size, progress));
         }
+        processable.close();
         log.info("finished processing" + processable.toString());
 
         return true;

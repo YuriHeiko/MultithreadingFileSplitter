@@ -12,7 +12,7 @@ public abstract class AbstractRecordsHolder<T, U> implements IHolder<T, U> {
     /**
      * The current progress
      */
-    private AtomicLong progress = new AtomicLong(0);
+    private final AtomicLong progress = new AtomicLong(0);
 
     /**
      * Gets current progress

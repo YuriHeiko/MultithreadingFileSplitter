@@ -122,6 +122,19 @@ public class FileChunk implements IProcessable {
         return size;
     }
 
+    @Override
+    public void close() {
+        try {
+            log.debug("Trying to close the source file.");
+            source.close();
+            log.debug("Trying to close the destination file.");
+            destination.close();
+        } catch (IOException e) {
+            log.error(source + "  error while closing file.");
+            throw new ServiceException(source + " error while closing file.");
+        }
+    }
+
     /**
      * Returns a string representation of this
      *

@@ -34,6 +34,7 @@ public class ChunkProperties {
         this.size = size;
         this.pointer = pointer;
         this.fileName = fileName;
+        log.debug("object initialized: " + this);
     }
 
     /**
@@ -92,5 +93,17 @@ public class ChunkProperties {
         result = 31 * result + (int) (pointer ^ (pointer >>> 32));
         result = 31 * result + fileName.hashCode();
         return result;
+    }
+
+    /**
+     * Returns a string representation of the object.
+     *
+     * @return  a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        return "size=" + size +
+                ", pointer=" + pointer +
+                ", fileName='" + fileName;
     }
 }

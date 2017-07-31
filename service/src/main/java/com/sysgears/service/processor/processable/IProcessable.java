@@ -40,4 +40,10 @@ public interface IProcessable {
      * @return The size
      */
     long getSize();
+
+    /**
+     * Closes IO streams and releases any system
+     * resources associated with the streams.
+     */
+    void close();
 }
