@@ -50,9 +50,9 @@ public class UTestFileChunksSet extends EasyMockSupport {
     }
 
     private void next(final int fileSize, final int chunkSize, final String fileName, final String partPrefix) throws Exception {
-        int chunksNumber = (fileSize / chunkSize) + (fileSize % chunkSize > 0 ? 1 : 0);
+        final int chunksNumber = (fileSize / chunkSize) + (fileSize % chunkSize > 0 ? 1 : 0);
 
-        FileChunksSet iterator = new FileChunksSet(fileSize, chunkSize, 0, fileName, partPrefix);
+        final FileChunksSet iterator = new FileChunksSet(fileSize, chunkSize, 0, fileName, partPrefix);
 
         for (int i = 0; i < chunksNumber; i++) {
             assertTrue(iterator.hasNext());
@@ -60,6 +60,7 @@ public class UTestFileChunksSet extends EasyMockSupport {
             assertTrue(next.getFileName().equals(fileName + partPrefix + i));
             assertTrue(next.getPointer() == chunkSize * i);
             assertTrue(next.getSize() == (fileSize - chunkSize * i > chunkSize ? chunkSize : fileSize - chunkSize * i));
+            assertTrue(next.equals(new ChunkProperties((fileSize - chunkSize * i > chunkSize ? chunkSize : fileSize - chunkSize * i),chunkSize * i, fileName + partPrefix + i)));
         }
     }
 }

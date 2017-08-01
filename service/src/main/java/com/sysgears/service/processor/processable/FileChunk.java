@@ -11,13 +11,13 @@ import java.io.RandomAccessFile;
  */
 public class FileChunk implements IProcessable {
     /**
-     * The {@link RandomAccessFile} source
+     * The source file name
      */
-    private final RandomAccessFile source;
+    private final String source;
     /**
-     * The {@code RandomAccessFile} destination
+     * The destination file name
      */
-    private final RandomAccessFile destination;
+    private final String destination;
     /**
      * The size of the source
      */
@@ -53,22 +53,8 @@ public class FileChunk implements IProcessable {
         this.size = size;
         this.sourceOffset = sourceOffset;
         this.destinationOffset = destinationOffset;
-
-        try {
-            log.debug("Trying to create the source file.");
-            this.source = new RandomAccessFile(source, "rw");
-        } catch (IOException e) {
-            log.error(source + " wrong file name.");
-            throw new ServiceException(source + " wrong file name.");
-        }
-
-        try {
-            log.debug("Trying to create the source file.");
-            this.destination = new RandomAccessFile(destination, "rw");
-        } catch (IOException e) {
-            log.error(source + " wrong file name.");
-            throw new ServiceException(source + " wrong file name.");
-        }
+        this.source = source;
+        this.destination = destination;
 
         log.debug("A new object initialized. Source: " + source + " | Destination: " + destination + " | " + this);
     }
@@ -94,22 +80,22 @@ public class FileChunk implements IProcessable {
     }
 
     /**
-     * Returns the source
+     * Returns the source file name
      *
-     * @return The source
+     * @return The source file name
      */
     @Override
-    public RandomAccessFile getSource() {
+    public String getSource() {
         return source;
     }
 
     /**
-     * Returns the destination
+     * Returns the destination file name
      *
-     * @return The destination
+     * @return The destination file name
      */
     @Override
-    public RandomAccessFile getDestination() {
+    public String getDestination() {
         return destination;
     }
 
@@ -123,36 +109,21 @@ public class FileChunk implements IProcessable {
         return size;
     }
 
-    /**
-     * Closes {@code RandomAccessFile} streams
-     *
-     * @throws ServiceException if an IO exception is occurred
-     */
-    @Override
-    public void close() throws ServiceException {
-        try {
-            log.debug("Trying to close the source file.");
-            source.close();
-            log.debug("Trying to close the destination file.");
-            destination.close();
-        } catch (IOException e) {
-            log.error(source + "  error while closing file.");
-            throw new ServiceException(source + " error while closing file.");
-        }
-    }
-
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         FileChunk fileChunk = (FileChunk) o;
 
-        if (size != fileChunk.size) return false;
-        if (sourceOffset != fileChunk.sourceOffset) return false;
-        if (destinationOffset != fileChunk.destinationOffset) return false;
-        if (!source.equals(fileChunk.source)) return false;
-        return destination.equals(fileChunk.destination);
+        return size == fileChunk.size &&
+                    sourceOffset == fileChunk.sourceOffset &&
+                        destinationOffset == fileChunk.destinationOffset &&
+                            source.equals(fileChunk.source) && destination.equals(fileChunk.destination);
     }
 
     @Override
@@ -172,7 +143,10 @@ public class FileChunk implements IProcessable {
      */
     @Override
     public String toString() {
-        return "FileChunk{size=" + size +
+        return "FileChunk{" +
+                "source='" + source + '\'' +
+                ", destination='" + destination + '\'' +
+                ", size=" + size +
                 ", sourceOffset=" + sourceOffset +
                 ", destinationOffset=" + destinationOffset +
                 '}';

@@ -28,14 +28,14 @@ public interface IProcessable {
      *
      * @return The source
      */
-    RandomAccessFile getSource();
+    String getSource();
 
     /**
      * Returns the destination
      *
      * @return The destination
      */
-    RandomAccessFile getDestination();
+    String getDestination();
 
     /**
      * Returns the size
@@ -43,12 +43,4 @@ public interface IProcessable {
      * @return The size
      */
     long getSize();
-
-    /**
-     * Closes IO streams and releases any system
-     * resources associated with the streams.
-     *
-     * @throws ServiceException if an IO exception is occurred
-     */
-    void close() throws ServiceException;
 }

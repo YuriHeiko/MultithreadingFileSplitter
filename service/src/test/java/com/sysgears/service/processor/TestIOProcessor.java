@@ -23,12 +23,6 @@ public class TestIOProcessor extends EasyMockSupport {
     @Mock
     private IProcessable processable;
 
-    @Mock
-    private RandomAccessFile source;
-
-    @Mock
-    private RandomAccessFile destination;
-
     @Test
     public void testIOProcessor() throws Exception {
         test(8, 2, 2);
@@ -45,18 +39,16 @@ public class TestIOProcessor extends EasyMockSupport {
         // Create mocks
         EasyMockSupport.injectMocks(this);
 
-        IOProcessor ioProcessor = new IOProcessor(ioHandler, holder, bufferSize);
+        final IOProcessor ioProcessor = new IOProcessor(ioHandler, holder, bufferSize);
 
         // IProcessable mock initialization
-        expect(processable.getSource()).andReturn(source).times(chunksNumber);
+        expect(processable.getSource()).andReturn("source").times(chunksNumber);
         for (int i = 0; i < chunksNumber; i++) {
             expect(processable.getSourceOffset()).andReturn(chunkSize * i);
         }
-        expect(processable.getDestination()).andReturn(destination).times(chunksNumber);
+        expect(processable.getDestination()).andReturn("destination").times(chunksNumber);
 
         expect(processable.getDestinationOffset()).andReturn(0L).times(chunksNumber);
-        processable.close();
-        expectLastCall().times(chunksNumber);
 
         // IOHandler and IHolder mock initialization
         for (int i = 0; i < chunksNumber; i++) {
@@ -67,8 +59,8 @@ public class TestIOProcessor extends EasyMockSupport {
             while (progress < size) {
                 int bytes = expBufferSize > size - progress ? (int) (size - progress) : expBufferSize;
                 byte[] buffer = new byte[expBufferSize];
-                expect(ioHandler.read(eq(source), aryEq(buffer), eq(chunkSize * i + progress))).andReturn(bytes);
-                ioHandler.write(eq(destination), aryEq(buffer), eq(progress), eq(bytes));
+                expect(ioHandler.read(eq("source"), aryEq(buffer), eq(chunkSize * i + progress))).andReturn(bytes);
+                ioHandler.write(eq("destination"), aryEq(buffer), eq(progress), eq(bytes));
                 progress += bytes;
 
                 Pair<Long, Long> pair = new Pair<>(size, progress);

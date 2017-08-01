@@ -54,9 +54,9 @@ public class IOProcessor implements IProcessableProcessor {
     public boolean process(final IProcessable processable) {
         final long size = processable.getSize();
         final byte[] buffer = new byte[bufferSize > size ? (int) size : bufferSize];
-        final RandomAccessFile source = processable.getSource();
+        final String source = processable.getSource();
         final long sourceOffset = processable.getSourceOffset();
-        final RandomAccessFile destination = processable.getDestination();
+        final String destination = processable.getDestination();
         final long destinationOffset = processable.getDestinationOffset();
         int bytes = 0;
         long progress = 0;
@@ -80,7 +80,6 @@ public class IOProcessor implements IProcessableProcessor {
             log.debug("Changing the statistic record");
             holder.add(Thread.currentThread().getId(), new Pair<>(size, progress));
         }
-        processable.close();
         log.info("finished processing" + processable.toString());
 
         return true;

@@ -29,19 +29,14 @@ public class ITestFileWorkersFactory extends EasyMockSupport {
     @Mock
     private IOProcessor processor;
 
-/*
-    @Mock
-    IProcessableFactory factory;
-*/
-
     @Test
     public void testCreate() throws Exception {
         EasyMockSupport.injectMocks(this);
 
-        Iterable<ChunkProperties> properties = new FileChunksSet(6, 2, 1, testPath + sourceName, partPrefix);
+        final Iterable<ChunkProperties> properties = new FileChunksSet(6, 2, 1, testPath + sourceName, partPrefix);
         expect(processor.process(new FileChunk(testPath + sourceName, testPath + sourceName + partPrefix + 1, 2L, 0L, 0L))).andReturn(true);
-//        expect(processor.process(new FileChunk(testPath + sourceName, testPath + sourceName + partPrefix + 2, 2L, 2L, 0L))).andReturn(true);
-//        expect(processor.process(new FileChunk(testPath + sourceName, testPath + sourceName + partPrefix + 3, 2L, 4L, 0L))).andReturn(true);
+        expect(processor.process(new FileChunk(testPath + sourceName, testPath + sourceName + partPrefix + 2, 2L, 2L, 0L))).andReturn(true);
+        expect(processor.process(new FileChunk(testPath + sourceName, testPath + sourceName + partPrefix + 3, 2L, 4L, 0L))).andReturn(true);
 
         replayAll();
 
