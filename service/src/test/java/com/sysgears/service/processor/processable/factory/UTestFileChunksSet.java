@@ -12,7 +12,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
-@Test(suiteName = "Service", testName = "InitTest")
+@Test(suiteName = "Service", testName = "FileChunkSetTest")
 public class UTestFileChunksSet extends EasyMockSupport {
 
     @Test(expectedExceptions = ServiceException.class)
@@ -43,9 +43,9 @@ public class UTestFileChunksSet extends EasyMockSupport {
     }
     @Test
     public void testNextOk() throws Exception {
-        next(12, 5, "a", ".b");
-        next(2, 1, "a", ".b");
         next(1, 1, "a", ".b");
+        next(2, 1, "a", ".b");
+        next(3, 2, "a", ".b");
         next(4, 2, "a", ".b");
     }
 

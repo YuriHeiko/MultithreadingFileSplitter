@@ -20,7 +20,6 @@ public class ITestCommands {
         setUp(Integer.MAX_VALUE);
         new CommandSplit(testPath, "3", 2, 1, 1000, partPrefix, 1024).execute();
         clean();
-
     }
 
     private void setUp(final long fileSize) throws IOException {

@@ -20,7 +20,7 @@ import java.util.concurrent.Callable;
 
 import static org.easymock.EasyMock.expect;
 
-@Test
+@Test(suiteName = "ServiceIT", testName = "FileWorkersFactoryTestIT")
 public class ITestFileWorkersFactory extends EasyMockSupport {
     private final String testPath = "/home/yuri/Documents/test/temp/";
     private final String sourceName = "source.file";
@@ -34,19 +34,21 @@ public class ITestFileWorkersFactory extends EasyMockSupport {
         EasyMockSupport.injectMocks(this);
 
         final Iterable<ChunkProperties> properties = new FileChunksSet(6, 2, 1, testPath + sourceName, partPrefix);
-        expect(processor.process(new FileChunk(testPath + sourceName, testPath + sourceName + partPrefix + 1, 2L, 0L, 0L))).andReturn(true);
-        expect(processor.process(new FileChunk(testPath + sourceName, testPath + sourceName + partPrefix + 2, 2L, 2L, 0L))).andReturn(true);
-        expect(processor.process(new FileChunk(testPath + sourceName, testPath + sourceName + partPrefix + 3, 2L, 4L, 0L))).andReturn(true);
 
+        expect(processor.process(new FileChunk(testPath + sourceName,
+                                               testPath + sourceName + partPrefix + 1, 2L, 0L, 0L))).andReturn(true);
+        expect(processor.process(new FileChunk(testPath + sourceName,
+                                               testPath + sourceName + partPrefix + 2, 2L, 2L, 0L))).andReturn(true);
+        expect(processor.process(new FileChunk(testPath + sourceName,
+                                               testPath + sourceName + partPrefix + 3, 2L, 4L, 0L))).andReturn(true);
         replayAll();
 
-        Collection<Callable<String>> callables = new FileWorkersFactory(processor, properties, new FileSplitFactory(), testPath + sourceName).create();
-
+        Collection<Callable<String>> callables = new FileWorkersFactory(processor, properties,
+                                                                new FileSplitFactory(), testPath + sourceName).create();
         for (Callable<String> callable : callables) {
             callable.call();
         }
 
         verifyAll();
     }
-
 }

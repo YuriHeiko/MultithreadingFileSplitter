@@ -12,8 +12,8 @@ import java.io.RandomAccessFile;
 
 import static org.easymock.EasyMock.*;
 
-@Test
-public class TestIOProcessor extends EasyMockSupport {
+@Test(suiteName = "Service", testName = "IOProcessorTest")
+public class UTestIOProcessor extends EasyMockSupport {
     @Mock
     private IOHandler ioHandler;
 
