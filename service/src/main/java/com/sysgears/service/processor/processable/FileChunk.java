@@ -141,6 +141,30 @@ public class FileChunk implements IProcessable {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FileChunk fileChunk = (FileChunk) o;
+
+        if (size != fileChunk.size) return false;
+        if (sourceOffset != fileChunk.sourceOffset) return false;
+        if (destinationOffset != fileChunk.destinationOffset) return false;
+        if (!source.equals(fileChunk.source)) return false;
+        return destination.equals(fileChunk.destination);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = source.hashCode();
+        result = 31 * result + destination.hashCode();
+        result = 31 * result + (int) (size ^ (size >>> 32));
+        result = 31 * result + (int) (sourceOffset ^ (sourceOffset >>> 32));
+        result = 31 * result + (int) (destinationOffset ^ (destinationOffset >>> 32));
+        return result;
+    }
+
     /**
      * Returns a string representation of this
      *

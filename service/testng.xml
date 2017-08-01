@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suites>
+    <!-- Declaring the suite-->
+    <suite name="Service">
+        <test name="InitTest">
+            <classes>
+                <class name="com.sysgears.service.processor.processable.factory.UTestFileChunksSet"/>
+            </classes>
+            <packages>
+                <package name="com.sysgears.example.user"/>
+            </packages>
+        </test>
+        <test name="userTest">
+            <!-- Initializing test's groups-->
+            <groups>
+                <run>
+                    <include name="addUser"/>
+                </run>
+            </groups>
+            <classes>
+                <class name="com.sysgears.example.user.ITestUserUpdater"/>
+            </classes>
+            <packages>
+                <package name="com.sysgears.example.user"/>
+            </packages>
+        </test>
+        <test name="itemTest">
+            <!-- Initializing test's groups-->
+            <groups>
+                <run>
+                    <include name="itemTests"/>
+                </run>
+            </groups>
+            <classes>
+                <class name="com.sysgears.example.user.ITestItemUpdater"/>
+            </classes>
+            <packages>
+                <package name="com.sysgears.example.user"/>
+            </packages>
+        </test>
+    </suite>
+</suites>

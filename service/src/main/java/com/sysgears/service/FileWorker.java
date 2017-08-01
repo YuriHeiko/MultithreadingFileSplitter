@@ -42,11 +42,7 @@ public class FileWorker implements Callable<String> {
     public String call() {
         String message = "";
         log.info("Start processing: " + processable.toString());
-        try {
-            processor.process(processable);
-        } catch (Throwable e) {
-            message = e.getMessage();
-        }
+        processor.process(processable);
 
         return message;
     }

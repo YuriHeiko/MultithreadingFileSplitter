@@ -2,6 +2,8 @@ package com.sysgears.service;
 
 import com.sysgears.service.processor.IOProcessor;
 import com.sysgears.service.processor.processable.ChunkProperties;
+import com.sysgears.service.processor.processable.FileChunk;
+import com.sysgears.service.processor.processable.FileChunksSet;
 import com.sysgears.service.processor.processable.factory.FileSplitFactory;
 import com.sysgears.service.processor.processable.factory.IProcessableFactory;
 import org.easymock.EasyMockSupport;
@@ -27,30 +29,29 @@ public class ITestFileWorkersFactory extends EasyMockSupport {
     @Mock
     private IOProcessor processor;
 
-    @Mock
-    private Iterable<ChunkProperties> properties;
-
-    @Mock
-    private Iterator<ChunkProperties> iterator;
-
 /*
+    @Mock
+    IProcessableFactory factory;
+*/
+
     @Test
-    public void testCreate() {
+    public void testCreate() throws Exception {
         EasyMockSupport.injectMocks(this);
-        expect(iterator.hasNext()).andReturn(true).times(3).andReturn(false);
-        expect(iterator.next()).andReturn(new ChunkProperties(2, 0, "chunks.part1")).
-                                andReturn(new ChunkProperties(2, 2, "chunks.part2")).
-                                andReturn(new ChunkProperties(1, 4, "chunks.part3"));
-        expect(properties.spliterator()).andAnswer(() -> Spliterators.spliteratorUnknownSize(iterator, 0));
+
+        Iterable<ChunkProperties> properties = new FileChunksSet(6, 2, 1, testPath + sourceName, partPrefix);
+        expect(processor.process(new FileChunk(testPath + sourceName, testPath + sourceName + partPrefix + 1, 2L, 0L, 0L))).andReturn(true);
+//        expect(processor.process(new FileChunk(testPath + sourceName, testPath + sourceName + partPrefix + 2, 2L, 2L, 0L))).andReturn(true);
+//        expect(processor.process(new FileChunk(testPath + sourceName, testPath + sourceName + partPrefix + 3, 2L, 4L, 0L))).andReturn(true);
 
         replayAll();
 
-        Collection<Callable<String>> callables = new FileWorkersFactory(processor, properties, new FileSplitFactory(), "chunks").create();
+        Collection<Callable<String>> callables = new FileWorkersFactory(processor, properties, new FileSplitFactory(), testPath + sourceName).create();
+
         for (Callable<String> callable : callables) {
-            System.out.println(callable);
+            callable.call();
         }
 
         verifyAll();
     }
-*/
+
 }
