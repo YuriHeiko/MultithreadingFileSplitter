@@ -40,6 +40,10 @@ public class FileProcessor {
      */
     public final static int BUFFER_SIZE = 1024;
     /**
+     * The max IO buffer size
+     */
+    public final static int MAX_BUFFER_SIZE = 1024*64;
+    /**
      * The default size of a chunk
      */
     public final static String CHUNK_SIZE = "10MB";

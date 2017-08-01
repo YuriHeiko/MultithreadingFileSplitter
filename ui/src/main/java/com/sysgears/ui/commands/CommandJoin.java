@@ -54,31 +54,34 @@ public class CommandJoin implements IExecutable {
     /**
      * The IO read/write buffer size
      */
-    @Parameter(names = "-b", description = "IO buffer size(bytes)")
+    @Parameter(names = "-b", description = "IO buffer size(bytes) (The max size: " + FileProcessor.MAX_BUFFER_SIZE + ")")
     private int bufferSize = FileProcessor.BUFFER_SIZE;
     /**
      * Logger
      */
     private final static Logger log = Logger.getLogger(CommandJoin.class);
-    /**
-     * The {@link FileSystem} instance
-     */
-    private final FileSystem fileSystem;
 
     /**
-     * Constructs an object with the default file system
+     * Constructs an object
      */
     public CommandJoin() {
-        fileSystem = FileSystems.getDefault();
     }
 
     /**
-     * Constructs an object with the given file system
+     * Constructs an object
      *
-     * @param fileSystem The {@code FileSystem}
+     * @param path           The path to the file
+     * @param threadsNumber  The number of threads
+     * @param delay          The statistic output delay
+     * @param partPrefix     The part prefix name
+     * @param bufferSize     The IO read/write buffer size
      */
-    public CommandJoin(FileSystem fileSystem) {
-        this.fileSystem = fileSystem;
+    public CommandJoin(String path, int threadsNumber, int delay, String partPrefix, int bufferSize) {
+        this.path = path;
+        this.threadsNumber = threadsNumber;
+        this.delay = delay;
+        this.partPrefix = partPrefix;
+        this.bufferSize = bufferSize;
     }
 
     /**
@@ -86,6 +89,11 @@ public class CommandJoin implements IExecutable {
      */
     @Override
     public void execute() {
+        if (bufferSize > FileProcessor.MAX_BUFFER_SIZE) {
+            bufferSize = FileProcessor.MAX_BUFFER_SIZE;
+            log.info("The buffer size was greater than allowed so that it was reduced to " + bufferSize);
+        }
+
         log.info("Starting a join command execution");
         log.info("File: " + path);
         final long chunkSize = new File(path).length();
@@ -94,7 +102,7 @@ public class CommandJoin implements IExecutable {
         log.info("The first part number: " + firstPartNumber);
         final String joinedFile = getJoinedFileName(path);
         log.info("The joined file name: " + joinedFile);
-        final long fileSize = countFinalFileSize(path, joinedFile, firstPartNumber);
+        final long fileSize = countFinalFileSize(joinedFile, firstPartNumber);
         log.info("The joined file size: " + fileSize);
 
         log.info("Creating the IO handler: " + SyncWriteIO.class.getSimpleName() + " object");
@@ -129,10 +137,10 @@ public class CommandJoin implements IExecutable {
     /**
      * Calculates the size of the joined file
      *
-     * @param fileName The first part file name
+     * @param joinedFileName The parent file name
      * @return The size of the joined file
      */
-    long countFinalFileSize(final String fileName, final String joinedFileName, final int firstPartNumber) {
+    long countFinalFileSize(final String joinedFileName, final int firstPartNumber) {
         long size = 0;
         int number = firstPartNumber;
 

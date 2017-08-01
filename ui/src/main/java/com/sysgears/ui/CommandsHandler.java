@@ -37,8 +37,8 @@ class CommandsHandler {
             try {
                 jBuilder.addCommand(command.newInstance());
             } catch (Exception e) {
-                log.fatal("An error has occurred during commands adding");
-                throw new UIException("An error has occurred during commands adding");
+                log.fatal("An error has occurred during commands adding: " + command);
+                throw new UIException("An error has occurred during commands adding: " + command);
             }
         }
         jCommander = jBuilder.build();

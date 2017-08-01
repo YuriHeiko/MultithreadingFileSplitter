@@ -7,6 +7,8 @@ import com.sysgears.statistic.IHolder;
 import javafx.util.Pair;
 import org.apache.log4j.Logger;
 
+import java.io.RandomAccessFile;
+
 /**
  * Processes the {@code IProcessable} object
  */
@@ -52,20 +54,24 @@ public class IOProcessor implements IProcessableProcessor {
     public boolean process(final IProcessable processable) {
         final long size = processable.getSize();
         final byte[] buffer = new byte[bufferSize > size ? (int) size : bufferSize];
+        final RandomAccessFile source = processable.getSource();
+        final long sourceOffset = processable.getSourceOffset();
+        final RandomAccessFile destination = processable.getDestination();
+        final long destinationOffset = processable.getDestinationOffset();
         int bytes = 0;
         long progress = 0;
 
         while (progress < size) {
             try {
-                bytes = io.read(processable.getSource(), buffer, processable.getSourceOffset() + progress);
-                log.debug("Read from source offset: " + (processable.getSourceOffset() + progress) + " bytes: " + bytes);
+                bytes = io.read(source, buffer, sourceOffset + progress);
+                log.debug("Read from source offset: " + (sourceOffset + progress) + " bytes: " + bytes);
             } catch (IOHandlerException e) {
                 log.error("Error during reading, source: " + processable.toString());
             }
             try {
-                io.write(processable.getDestination(), buffer, processable.getDestinationOffset() + progress, bytes);
+                io.write(destination, buffer, destinationOffset + progress, bytes);
                 log.debug("Written to destination offset: " +
-                            (processable.getDestinationOffset() + progress) + " bytes: " + bytes);
+                            (destinationOffset + progress) + " bytes: " + bytes);
             } catch (IOHandlerException e) {
                 log.error("Error during writing, destination: " + processable.toString());
             }

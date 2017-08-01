@@ -22,8 +22,6 @@ import javafx.util.Pair;
 import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 
 /**
  * A command to split a file into chunks
@@ -63,7 +61,7 @@ public class CommandSplit implements IExecutable {
     /**
      * The IO read/write buffer size
      */
-    @Parameter(names = "-b", description = "IO buffer size(bytes)")
+    @Parameter(names = "-b", description = "IO buffer size(bytes) (The max size: " + FileProcessor.MAX_BUFFER_SIZE + ")")
     private int bufferSize = FileProcessor.BUFFER_SIZE;
     /**
      * The string representation of byte contractions
@@ -77,6 +75,12 @@ public class CommandSplit implements IExecutable {
      * Logger
      */
     private final static Logger log = Logger.getLogger(CommandSplit.class);
+
+    /**
+     * Constructs an object
+     */
+    public CommandSplit() {
+    }
 
     /**
      * Constructs an object
@@ -110,6 +114,11 @@ public class CommandSplit implements IExecutable {
      */
     @Override
     public void execute() {
+        if (bufferSize > FileProcessor.MAX_BUFFER_SIZE) {
+            bufferSize = FileProcessor.MAX_BUFFER_SIZE;
+            log.info("The buffer size was greater than allowed so that it was reduced to " + bufferSize);
+        }
+
         final long chunkSizeNumber = convertToNumber(chunkSize);
 
         log.info("Starting a split command execution");

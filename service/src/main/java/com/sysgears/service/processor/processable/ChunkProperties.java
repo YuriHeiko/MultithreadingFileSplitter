@@ -65,37 +65,6 @@ public class ChunkProperties {
     }
 
     /**
-     * Indicates whether some other object is "equal to" this one.
-     *
-     * @param o the reference object with which to compare.
-     * @return {@code true} if this object is the same as the obj
-     * argument; {@code false} otherwise.
-     */
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ChunkProperties that = (ChunkProperties) o;
-
-        return size == that.size && pointer == that.pointer && fileName.equals(that.fileName);
-    }
-
-    /**
-     * Returns a hash code value for the object. This method is
-     * supported for the benefit of hash tables such as those provided by
-     *
-     * @return a hash code value for this object.
-     */
-    @Override
-    public int hashCode() {
-        int result = (int) (size ^ (size >>> 32));
-        result = 31 * result + (int) (pointer ^ (pointer >>> 32));
-        result = 31 * result + fileName.hashCode();
-        return result;
-    }
-
-    /**
      * Returns a string representation of the object.
      *
      * @return  a string representation of the object.

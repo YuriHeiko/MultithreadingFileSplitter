@@ -10,7 +10,9 @@ import java.util.NoSuchElementException;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
+@Test(suiteName = "Service", testName = "InitTest")
 public class UTestFileChunksSet extends EasyMockSupport {
 
     @Test(expectedExceptions = ServiceException.class)
@@ -39,23 +41,25 @@ public class UTestFileChunksSet extends EasyMockSupport {
         iterator.next();
         iterator.next();
     }
-
     @Test
     public void testNextOk() throws Exception {
-        FileChunksSet iterator = new FileChunksSet(6, 2, 0, "a", ".b");
+        next(12, 5, "a", ".b");
+        next(2, 1, "a", ".b");
+        next(1, 1, "a", ".b");
+        next(4, 2, "a", ".b");
+    }
 
-        assertTrue(iterator.hasNext());
-        ChunkProperties next = iterator.next();
-        assertTrue(next.equals(new ChunkProperties(2, 0, "a.b0")));
+    private void next(final int fileSize, final int chunkSize, final String fileName, final String partPrefix) throws Exception {
+        int chunksNumber = (fileSize / chunkSize) + (fileSize % chunkSize > 0 ? 1 : 0);
 
-        assertTrue(iterator.hasNext());
-        next = iterator.next();
-        assertTrue(next.equals(new ChunkProperties(2, 2, "a.b1")));
+        FileChunksSet iterator = new FileChunksSet(fileSize, chunkSize, 0, fileName, partPrefix);
 
-        assertTrue(iterator.hasNext());
-        next = iterator.next();
-        assertTrue(next.equals(new ChunkProperties(2, 4, "a.b2")));
-
-        assertFalse(iterator.hasNext());
+        for (int i = 0; i < chunksNumber; i++) {
+            assertTrue(iterator.hasNext());
+            ChunkProperties next = iterator.next();
+            assertTrue(next.getFileName().equals(fileName + partPrefix + i));
+            assertTrue(next.getPointer() == chunkSize * i);
+            assertTrue(next.getSize() == (fileSize - chunkSize * i > chunkSize ? chunkSize : fileSize - chunkSize * i));
+        }
     }
 }

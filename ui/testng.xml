@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suites>
     <!-- Declaring the suite-->
-    <suite name="UI">
-        <test name="initTests">
+    <suite name="Service">
+        <test name="InitTest">
             <classes>
-                <class name="com.sysgears.ui.commands.ITestCommands"/>
+                <class name="com.sysgears.service.processor.processable.factory"/>
             </classes>
             <packages>
                 <package name="com.sysgears.example.user"/>
