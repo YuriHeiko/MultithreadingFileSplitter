@@ -8,7 +8,7 @@ import java.io.RandomAccessFile;
 /**
  * Contains an interface contract and common IO logic
  */
-public abstract class IOHandler {
+public class IOHandler {
     /**
      * Logger
      */

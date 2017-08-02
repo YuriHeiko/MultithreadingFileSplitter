@@ -4,7 +4,6 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import com.sysgears.io.IOHandler;
-import com.sysgears.io.SyncReadIO;
 import com.sysgears.service.FileWorkersFactory;
 import com.sysgears.service.processor.IOProcessor;
 import com.sysgears.service.processor.IProcessableProcessor;
@@ -131,8 +130,8 @@ public class CommandSplit implements IExecutable {
                                          chunkSizeNumber + "bytes > " + fileSize + "bytes");
         }
 
-        log.info("Creating the IO handler: " + SyncReadIO.class.getSimpleName() + " object");
-        final IOHandler syncReadIO = new SyncReadIO();
+        log.info("Creating the IO handler: " + IOHandler.class.getSimpleName() + " object");
+        final IOHandler syncReadIO = new IOHandler();
 
         log.info("Creating " + IProcessableFactory.class.getSimpleName() + " object");
         IProcessableFactory processableFactory = new FileSplitFactory();

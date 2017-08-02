@@ -4,7 +4,6 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import com.sysgears.io.IOHandler;
-import com.sysgears.io.SyncWriteIO;
 import com.sysgears.service.FileWorkersFactory;
 import com.sysgears.service.processor.IOProcessor;
 import com.sysgears.service.processor.IProcessableProcessor;
@@ -103,8 +102,8 @@ public class CommandJoin implements IExecutable {
         final long fileSize = countFinalFileSize(joinedFile, firstPartNumber);
         log.info("The joined file size: " + fileSize);
 
-        log.info("Creating the IO handler: " + SyncWriteIO.class.getSimpleName() + " object");
-        final IOHandler syncWriteIO = new SyncWriteIO();
+        log.info("Creating the IO handler: " + IOHandler.class.getSimpleName() + " object");
+        final IOHandler syncWriteIO = new IOHandler();
 
         log.info("Creating " + IProcessableFactory.class.getSimpleName() + " object");
         IProcessableFactory processableFactory = new FileJoinFactory();
