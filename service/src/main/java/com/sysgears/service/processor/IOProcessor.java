@@ -7,8 +7,6 @@ import com.sysgears.statistic.IHolder;
 import javafx.util.Pair;
 import org.apache.log4j.Logger;
 
-import java.io.RandomAccessFile;
-
 /**
  * Processes the {@code IProcessable} object
  */

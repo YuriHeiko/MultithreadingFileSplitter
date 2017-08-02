@@ -8,8 +8,6 @@ import org.easymock.EasyMockSupport;
 import org.easymock.Mock;
 import org.testng.annotations.Test;
 
-import java.io.RandomAccessFile;
-
 import static org.easymock.EasyMock.*;
 
 @Test(suiteName = "Service", testName = "IOProcessorTest")
@@ -23,16 +21,8 @@ public class UTestIOProcessor extends EasyMockSupport {
     @Mock
     private IProcessable processable;
 
-    @Test
-    public void testIOProcessor() throws Exception {
-        test(8, 2, 2);
-        resetAll();
-        test(2, 2, 1024);
-        resetAll();
-        test(64_003, 9_997, 1_022);
-    }
-
-    private void test(final long sourceSize, final long chunkSize, final int bufferSize) throws Exception {
+    @Test(dataProvider = "IOProcessor", dataProviderClass = UTestDataProvider.class, groups = "IOProcessor")
+    public void testIOProcessor(final long sourceSize, final long chunkSize, final int bufferSize) throws Exception {
         final int chunksNumber = (int) (sourceSize / chunkSize) + (sourceSize % chunkSize > 0 ? 1 : 0);
         final int expBufferSize = bufferSize > chunkSize ? (int) chunkSize : bufferSize;
 
@@ -76,5 +66,7 @@ public class UTestIOProcessor extends EasyMockSupport {
         }
 
         verifyAll();
+
+        resetAll();
     }
 }

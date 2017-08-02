@@ -5,11 +5,11 @@ import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import com.sysgears.io.IOHandler;
 import com.sysgears.io.SyncReadIO;
-import com.sysgears.service.processor.processable.ChunkProperties;
-import com.sysgears.service.processor.processable.FileChunksSet;
 import com.sysgears.service.FileWorkersFactory;
 import com.sysgears.service.processor.IOProcessor;
 import com.sysgears.service.processor.IProcessableProcessor;
+import com.sysgears.service.processor.processable.ChunkProperties;
+import com.sysgears.service.processor.processable.FileChunksSet;
 import com.sysgears.service.processor.processable.factory.FileSplitFactory;
 import com.sysgears.service.processor.processable.factory.IProcessableFactory;
 import com.sysgears.statistic.AbstractRecordsHolder;
@@ -138,11 +138,7 @@ public class CommandSplit implements IExecutable {
         IProcessableFactory processableFactory = new FileSplitFactory();
 
         log.info("Creating " + FileChunksSet.class.getSimpleName() + " object");
-        final Iterable<ChunkProperties> chunksSet = new FileChunksSet(fileSize,
-                                                                      chunkSizeNumber,
-                                                                      startNumber,
-                                                                      path,
-                                                                      partPrefix);
+        final Iterable<ChunkProperties> chunks = new FileChunksSet(fileSize, chunkSizeNumber, startNumber, path, partPrefix);
 
         log.info("Creating the statistic holder: " + ConcurrentRecordsHolder.class.getSimpleName() + " object");
         final AbstractRecordsHolder<Long, Pair<Long, Long>> holder = new ConcurrentRecordsHolder<>();
@@ -154,7 +150,7 @@ public class CommandSplit implements IExecutable {
         final IProcessableProcessor processor = new IOProcessor(syncReadIO, holder, bufferSize);
 
         log.info("Creating the workers factory" + FileWorkersFactory.class.getSimpleName() + " object");
-        final FileWorkersFactory wFactory = new FileWorkersFactory(processor, chunksSet, processableFactory, path);
+        final FileWorkersFactory wFactory = new FileWorkersFactory(processor, chunks, processableFactory, path);
 
         log.info("Creating the execution service: " + ServiceRunner.class.getSimpleName() + " object");
         final ServiceRunner serviceRunner = new ServiceRunner(wFactory, viewer, threadsNumber);

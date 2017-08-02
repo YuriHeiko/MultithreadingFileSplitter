@@ -1,10 +1,5 @@
 package com.sysgears.service.processor.processable;
 
-import com.sysgears.service.ServiceException;
-
-import java.io.IOException;
-import java.io.RandomAccessFile;
-
 /**
  * Contains the common interface for the processable objects
  */

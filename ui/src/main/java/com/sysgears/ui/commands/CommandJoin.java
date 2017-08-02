@@ -5,11 +5,11 @@ import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import com.sysgears.io.IOHandler;
 import com.sysgears.io.SyncWriteIO;
-import com.sysgears.service.processor.processable.ChunkProperties;
-import com.sysgears.service.processor.processable.FileChunksSet;
 import com.sysgears.service.FileWorkersFactory;
 import com.sysgears.service.processor.IOProcessor;
 import com.sysgears.service.processor.IProcessableProcessor;
+import com.sysgears.service.processor.processable.ChunkProperties;
+import com.sysgears.service.processor.processable.FileChunksSet;
 import com.sysgears.service.processor.processable.factory.FileJoinFactory;
 import com.sysgears.service.processor.processable.factory.IProcessableFactory;
 import com.sysgears.statistic.AbstractRecordsHolder;
@@ -22,8 +22,6 @@ import javafx.util.Pair;
 import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 
 /**
  * A command to glue a parts into one file
@@ -112,8 +110,7 @@ public class CommandJoin implements IExecutable {
         IProcessableFactory processableFactory = new FileJoinFactory();
 
         log.info("Creating " + FileChunksSet.class.getSimpleName() + " object");
-        final Iterable<ChunkProperties> chunksSet = new FileChunksSet(fileSize, chunkSize, firstPartNumber,
-                                                                      joinedFile, partPrefix);
+        final Iterable<ChunkProperties> chunks = new FileChunksSet(fileSize, chunkSize, firstPartNumber, joinedFile, partPrefix);
 
         log.info("Creating the statistic holder: " + ConcurrentRecordsHolder.class.getSimpleName() + " object");
         final AbstractRecordsHolder<Long, Pair<Long, Long>> holder = new ConcurrentRecordsHolder<>();
@@ -125,7 +122,7 @@ public class CommandJoin implements IExecutable {
         final IProcessableProcessor processor = new IOProcessor(syncWriteIO, holder, bufferSize);
 
         log.info("Creating the workers factory" + FileWorkersFactory.class.getSimpleName() + " object");
-        final FileWorkersFactory wFactory = new FileWorkersFactory(processor, chunksSet, processableFactory, joinedFile);
+        final FileWorkersFactory wFactory = new FileWorkersFactory(processor, chunks, processableFactory, joinedFile);
 
         log.info("Creating the execution service: " + ServiceRunner.class.getSimpleName() + " object");
         final ServiceRunner serviceRunner = new ServiceRunner(wFactory, viewer, threadsNumber);

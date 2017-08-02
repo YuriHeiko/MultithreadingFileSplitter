@@ -18,6 +18,8 @@ public class FPRunner {
         // split -p r.md -s 400 -d 1000
         // split -p /home/yuri/Documents/test/r.md -s 100 -d 1000
         // join -p /home/yuri/Documents/test/r.md.part1
+        // split -p /home/yuri/Documents/test/a.txt -s 100 -d 1000
+        // join -p /home/yuri/Documents/test/a.txt.part1
         new FileProcessor().run();
     }
 }

@@ -2,7 +2,21 @@
 <suites>
     <!-- Declaring the suite-->
     <suite name="Service">
+        <test name="InitTest">
+            <classes>
+                <class name="com.sysgears.service.processor.UTestDataProvider"/>
+            </classes>
+            <packages>
+                <package name="com.sysgears.service.processor"/>
+            </packages>
+        </test>
         <test name="FileChunkSetTest">
+            <groups>
+                <run>
+                    <include name="hasNext"/>
+                    <include name="next"/>
+                </run>
+            </groups>
             <classes>
                 <class name="com.sysgears.service.processor.processable.factory.UTestFileChunksSet"/>
             </classes>
@@ -11,6 +25,11 @@
             </packages>
         </test>
         <test name="IOProcessorTest">
+            <groups>
+                <run>
+                    <include name="IOProcessor"/>
+                </run>
+            </groups>
             <classes>
                 <class name="com.sysgears.service.processor.UTestIOProcessor"/>
             </classes>

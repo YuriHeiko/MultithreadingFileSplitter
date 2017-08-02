@@ -5,17 +5,11 @@ import com.sysgears.service.processor.processable.ChunkProperties;
 import com.sysgears.service.processor.processable.FileChunk;
 import com.sysgears.service.processor.processable.FileChunksSet;
 import com.sysgears.service.processor.processable.factory.FileSplitFactory;
-import com.sysgears.service.processor.processable.factory.IProcessableFactory;
 import org.easymock.EasyMockSupport;
-import org.easymock.IAnswer;
 import org.easymock.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.annotations.Test;
 
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.Spliterator;
-import java.util.Spliterators;
 import java.util.concurrent.Callable;
 
 import static org.easymock.EasyMock.expect;
@@ -29,7 +23,7 @@ public class ITestFileWorkersFactory extends EasyMockSupport {
     @Mock
     private IOProcessor processor;
 
-    @Test
+    @Test(groups = "ITServiceTest")
     public void testCreate() throws Exception {
         EasyMockSupport.injectMocks(this);
 

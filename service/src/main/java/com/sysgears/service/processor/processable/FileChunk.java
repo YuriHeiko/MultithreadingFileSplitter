@@ -3,9 +3,6 @@ package com.sysgears.service.processor.processable;
 import com.sysgears.service.ServiceException;
 import org.apache.log4j.Logger;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
-
 /**
  * The processable chunk of a file
  */
