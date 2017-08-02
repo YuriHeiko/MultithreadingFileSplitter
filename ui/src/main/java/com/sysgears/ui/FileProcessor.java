@@ -117,6 +117,7 @@ public class FileProcessor {
                     System.out.println("*******************************************");
                     System.out.println("* The resulting file(s) can be corrupted! *");
                     System.out.println("*******************************************");
+                    System.out.println();
                 }
             }
 

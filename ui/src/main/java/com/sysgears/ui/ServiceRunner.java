@@ -1,5 +1,6 @@
 package com.sysgears.ui;
 
+import com.google.common.util.concurrent.UncaughtExceptionHandlers;
 import com.sysgears.service.FileWorkersFactory;
 import com.sysgears.statistic.Viewer;
 import javafx.util.Pair;
@@ -51,7 +52,7 @@ public class ServiceRunner {
     public void run() {
         try {
             log.debug("Getting new thread pool.");
-            ExecutorService service = Executors.newFixedThreadPool(threadsNumber + 1);
+            ExecutorService service = Executors.newFixedThreadPool(threadsNumber);
             log.debug("Starting statistic viewer.");
             Thread viewerThread = new Thread(viewer);
             viewerThread.start();
@@ -70,12 +71,11 @@ public class ServiceRunner {
                         System.out.println("An error has occurred during operations: " + s);
                     }
                 } catch (ExecutionException e) {
+                    viewerThread.interrupt();
                     log.error("A some thread work has been canceled: " + e.getMessage());
                     throw new UIException("A some thread work has been canceled: " + e.getMessage());
                 }
             }
-            Thread.sleep(1000);
-            viewerThread.interrupt();
         } catch (InterruptedException e) {
             log.error("Service shutting down awaiting has been suddenly interrupted: " + e.getMessage());
             throw new UIException("Service shutting down awaiting has been suddenly interrupted. Work has been halted: " + e.getMessage());

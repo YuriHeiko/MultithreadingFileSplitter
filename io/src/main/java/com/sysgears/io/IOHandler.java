@@ -36,6 +36,9 @@ public class IOHandler implements IIO {
         } catch (IOException e) {
             log.error("The IO error during writing. Message: " + e.getMessage());
             throw new IOHandlerException("The IO error during writing. Message: " + e.getMessage());
+        } catch (IndexOutOfBoundsException e) {
+            log.error("The file to read is less than should be. Message: " + e.getMessage());
+            throw new IOHandlerException("The file to read is less than should be. Message: " + e.getMessage());
         }
     }
 
@@ -62,6 +65,9 @@ public class IOHandler implements IIO {
         } catch (IOException e) {
             log.error("The IO error during reading. Message: " + e.getMessage());
             throw new IOHandlerException("The IO error during reading. Message: " + e.getMessage());
+        } catch (IndexOutOfBoundsException e) {
+            log.error("The file to read is less than should be. Message: " + e.getMessage());
+            throw new IOHandlerException("The file to read is less than should be. Message: " + e.getMessage());
         }
 
         return read;

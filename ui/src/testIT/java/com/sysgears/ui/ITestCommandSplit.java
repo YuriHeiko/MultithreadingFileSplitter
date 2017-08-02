@@ -1,12 +1,10 @@
 package com.sysgears.ui;
 
+import com.sysgears.ui.commands.CommandJoin;
 import com.sysgears.ui.commands.CommandSplit;
 import org.testng.annotations.Test;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.SequenceInputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,27 +19,30 @@ import static org.testng.internal.junit.ArrayAsserts.assertArrayEquals;
 
 @Test(suiteName = "UI", testName = "CommandsTest")
 public class ITestCommandSplit {
-    private final String testPath = "/home/yuri/Documents/test/temp/";
+    private final String testPath = "./temp/";
     private final String testFile = "test.txt";
     private byte[] buffer;
 
     @Test(dataProvider = "SplitCommand", dataProviderClass = ITestDataProvider.class, groups = "UI")
-    public void testCreate(final long chunkSize,
-                           final int threadsNumber,
-                           final int startNumber,
-                           final int delay,
-                           final String partPrefix,
-                           final int bufferSize,
-                           final long fileSize,
-                           final int arraySize) throws Exception {
+    public void testSplitCommand(final long chunkSize,
+                                 final int threadsNumber,
+                                 final int startNumber,
+                                 final int delay,
+                                 final String partPrefix,
+                                 final int bufferSize,
+                                 final long fileSize,
+                                 final int arraySize) throws Exception {
         try {
             buffer = populateBuffer(arraySize, arraySize);
 
-            setUp(fileSize, "");
+            setUp(fileSize, "", 0);
 
             // Do a command
+            PrintStream stream = System.out;
+            System.setOut(new PrintStream(new ByteArrayOutputStream(1000)));
             new CommandSplit(testPath + testFile, String.valueOf(chunkSize),
-                                    threadsNumber, startNumber, delay, partPrefix, bufferSize).execute();
+                                threadsNumber, startNumber, delay, partPrefix, bufferSize).execute();
+            System.setOut(stream);
 
             // Check results
             Map<Integer, File> map = new TreeMap<>();
@@ -64,28 +65,67 @@ public class ITestCommandSplit {
                 counter++;
             }
 
-            SequenceInputStream stream = new SequenceInputStream(vector.elements());
-
-            for (int i = 0; i < (fileSize / chunkSize + (fileSize % chunkSize > 0 ? 1 : 0)); i++) {
-                byte[] readBuffer = new byte[arraySize];
-                int j;
-                for (j = 0; j < arraySize; j++) {
-                    int b = stream.read();
-                    if (b != -1) {
-                        readBuffer[j] = (byte) b;
-                    } else {
-                        break;
-                    }
-                }
-                byte[] expected = j == arraySize ? buffer : populateBuffer(arraySize, j);
-                assertArrayEquals("Possibly, the wrong part: " + i, readBuffer, expected);
-            }
+            checkResultingFiles(new SequenceInputStream(vector.elements()),
+                               (int) (fileSize / chunkSize + (fileSize % chunkSize > 0 ? 1 : 0)), arraySize);
         } finally {
-            clean();
+            clean(new File(testPath));
         }
     }
 
-    private byte[] populateBuffer(int arraySize, int pointer) {
+    @Test(dataProvider = "JoinCommand", dataProviderClass = ITestDataProvider.class, groups = "UI")
+    public void testJoinCommand(final long chunkSize,
+                                final int threadsNumber,
+                                final int delay,
+                                final String partPrefix,
+                                final int bufferSize,
+                                final long fileSize,
+                                final int arraySize) throws Exception {
+        try {
+            buffer = populateBuffer(arraySize, arraySize);
+
+            long progress = 0;
+            int counter = 0;
+            int prevPointer = 0;
+            while (fileSize > progress) {
+                setUp(fileSize - progress > chunkSize ? chunkSize : fileSize - progress, partPrefix + ++counter,
+                        prevPointer);
+                progress += chunkSize;
+                prevPointer = (int) (progress % arraySize);
+            }
+
+            // Do a command
+            PrintStream stream = System.out;
+            System.setOut(new PrintStream(new ByteArrayOutputStream(1000)));
+            new CommandJoin(testPath + testFile + partPrefix + 1, threadsNumber, delay, partPrefix, bufferSize).execute();
+            System.setOut(stream);
+
+            // Check results
+            checkResultingFiles(new FileInputStream(testPath + testFile),
+                               (int) (fileSize / chunkSize + (fileSize % chunkSize > 0 ? 1 : 0)), arraySize);
+        } finally {
+            clean(new File(testPath));
+        }
+    }
+
+    private void checkResultingFiles(InputStream stream, int iterations, int arraySize) throws IOException {
+        for (int i = 0; i < iterations; i++) {
+            byte[] readBuffer = new byte[arraySize];
+            int j;
+            for (j = 0; j < arraySize; j++) {
+                int b = stream.read();
+                if (b != -1) {
+                    readBuffer[j] = (byte) b;
+                } else {
+                    break;
+                }
+            }
+            byte[] expected = j == arraySize ? buffer : populateBuffer(arraySize, j);
+            assertArrayEquals("Possibly, the wrong part: " + i, readBuffer, expected);
+        }
+        stream.close();
+    }
+
+    private byte[] populateBuffer(final int arraySize, final int pointer) {
         byte[] result = new byte[arraySize];
         for (int i = 0; i < pointer; i++) {
             result[i] = (byte) i;
@@ -93,22 +133,33 @@ public class ITestCommandSplit {
         return result;
     }
 
-    private void setUp(final long fileSize, final String postFix) throws IOException {
+    private void setUp(final long fileSize, final String postFix, final int startFrom) throws IOException {
+        Files.createDirectories(Paths.get(testPath));
         Path file = Files.createFile(Paths.get(testPath + testFile + postFix));
         long progress = 0;
+
+        if (startFrom > 0) {
+            int bytesToWrite = buffer.length - startFrom > fileSize ? (int) (startFrom + fileSize) : buffer.length;
+            Files.write(file, Arrays.copyOfRange(buffer, startFrom, bytesToWrite));
+            progress = bytesToWrite - startFrom;
+        }
+
         while (fileSize - buffer.length > progress) {
             progress += buffer.length;
             Files.write(file, buffer, StandardOpenOption.APPEND);
         }
 
-        Files.write(file, Arrays.copyOf(buffer, (int) (fileSize - progress)), StandardOpenOption.APPEND);
+        if (fileSize > progress) {
+            Files.write(file, Arrays.copyOf(buffer, (int) (fileSize - progress)), StandardOpenOption.APPEND);
+        }
     }
 
-    private void clean() {
-        for (File file : new File(testPath).listFiles()) {
-            if (file.isFile()) {
-                file.delete();
+    private boolean clean(File dir) {
+        if (dir.isDirectory()) {
+            for (String child : dir.list()) {
+                clean(new File(dir, child));
             }
         }
+        return dir.delete();
     }
 }
