@@ -3,6 +3,7 @@ package com.sysgears.ui.commands;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
+import com.sysgears.io.IIO;
 import com.sysgears.io.IOHandler;
 import com.sysgears.service.FileWorkersFactory;
 import com.sysgears.service.processor.IOProcessor;
@@ -103,7 +104,7 @@ public class CommandJoin implements IExecutable {
         log.info("The joined file size: " + fileSize);
 
         log.info("Creating the IO handler: " + IOHandler.class.getSimpleName() + " object");
-        final IOHandler syncWriteIO = new IOHandler();
+        final IIO io = new IOHandler();
 
         log.info("Creating " + IProcessableFactory.class.getSimpleName() + " object");
         IProcessableFactory processableFactory = new FileJoinFactory();
@@ -118,7 +119,7 @@ public class CommandJoin implements IExecutable {
         final Viewer<Long, Pair<Long, Long>> viewer = new Viewer<>(holder, fileSize, delay);
 
         log.info("Creating the IO processor: " + IOProcessor.class.getSimpleName() + " object");
-        final IProcessableProcessor processor = new IOProcessor(syncWriteIO, holder, bufferSize);
+        final IProcessableProcessor processor = new IOProcessor(io, holder, bufferSize);
 
         log.info("Creating the workers factory" + FileWorkersFactory.class.getSimpleName() + " object");
         final FileWorkersFactory wFactory = new FileWorkersFactory(processor, chunks, processableFactory, joinedFile);

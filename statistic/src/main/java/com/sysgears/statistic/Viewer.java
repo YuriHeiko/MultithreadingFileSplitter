@@ -72,7 +72,8 @@ public class Viewer<T, U extends Pair<Long, Long>> implements Runnable {
             try {
                 Thread.sleep(outputDelay);
             } catch (InterruptedException e) {
-                log.warn("An attempt to interrupt the statistical thread.");
+                log.warn("The statistical thread was interrupted");
+                return;
             }
         }
 

@@ -53,7 +53,8 @@ public class ServiceRunner {
             log.debug("Getting new thread pool.");
             ExecutorService service = Executors.newFixedThreadPool(threadsNumber + 1);
             log.debug("Starting statistic viewer.");
-            service.submit(viewer);
+            Thread viewerThread = new Thread(viewer);
+            viewerThread.start();
 
             log.debug("Create and invoke workers.");
             List<Future<String>> futures = service.invokeAll(factory.create());
@@ -68,14 +69,13 @@ public class ServiceRunner {
                     if (!s.isEmpty()) {
                         System.out.println("An error has occurred during operations: " + s);
                     }
-                } catch (CancellationException e) {
+                } catch (ExecutionException e) {
                     log.error("A some thread work has been canceled: " + e.getMessage());
                     throw new UIException("A some thread work has been canceled: " + e.getMessage());
-                } catch (Exception e) {
-                    log.error("An Exception was thrown: " + e.getMessage());
-                    throw new UIException("An Exception was thrown: " + e.getMessage());
                 }
             }
+            Thread.sleep(1000);
+            viewerThread.interrupt();
         } catch (InterruptedException e) {
             log.error("Service shutting down awaiting has been suddenly interrupted: " + e.getMessage());
             throw new UIException("Service shutting down awaiting has been suddenly interrupted. Work has been halted: " + e.getMessage());

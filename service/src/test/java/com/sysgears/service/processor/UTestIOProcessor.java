@@ -1,25 +1,37 @@
 package com.sysgears.service.processor;
 
-import com.sysgears.io.IOHandler;
+import com.sysgears.io.IIO;
+import com.sysgears.service.RandomAccessFileEquals;
 import com.sysgears.service.processor.processable.IProcessable;
 import com.sysgears.statistic.IHolder;
 import javafx.util.Pair;
+import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 import org.easymock.Mock;
 import org.testng.annotations.Test;
+
+import java.io.RandomAccessFile;
 
 import static org.easymock.EasyMock.*;
 
 @Test(suiteName = "Service", testName = "IOProcessorTest")
 public class UTestIOProcessor extends EasyMockSupport {
+    private final String path = "/home/yuri/Documents/test/temp/";
+    private final String sourceName = "source.file";
+    private final String destinationName = "destination.file";
+
     @Mock
-    private IOHandler ioHandler;
+    private IIO IIO;
 
     @Mock
     private IHolder<Long, Pair<Long, Long>> holder;
 
     @Mock
     private IProcessable processable;
+
+    private RandomAccessFile source;
+
+    private RandomAccessFile destination;
 
     @Test(dataProvider = "IOProcessor", dataProviderClass = UTestDataProvider.class, groups = "IOProcessor")
     public void testIOProcessor(final long sourceSize, final long chunkSize, final int bufferSize) throws Exception {
@@ -29,14 +41,17 @@ public class UTestIOProcessor extends EasyMockSupport {
         // Create mocks
         EasyMockSupport.injectMocks(this);
 
-        final IOProcessor ioProcessor = new IOProcessor(ioHandler, holder, bufferSize);
+        source = new RandomAccessFile(path + sourceName, "rw");
+        destination = new RandomAccessFile(path + destinationName, "rw");
+
+        final IOProcessor ioProcessor = new IOProcessor(IIO, holder, bufferSize);
 
         // IProcessable mock initialization
-        expect(processable.getSource()).andReturn("source").times(chunksNumber);
+        expect(processable.getSource()).andReturn(path + sourceName).times(chunksNumber);
         for (int i = 0; i < chunksNumber; i++) {
             expect(processable.getSourceOffset()).andReturn(chunkSize * i);
         }
-        expect(processable.getDestination()).andReturn("destination").times(chunksNumber);
+        expect(processable.getDestination()).andReturn(path + destinationName).times(chunksNumber);
 
         expect(processable.getDestinationOffset()).andReturn(0L).times(chunksNumber);
 
@@ -49,8 +64,8 @@ public class UTestIOProcessor extends EasyMockSupport {
             while (progress < size) {
                 int bytes = expBufferSize > size - progress ? (int) (size - progress) : expBufferSize;
                 byte[] buffer = new byte[expBufferSize];
-                expect(ioHandler.read(eq("source"), aryEq(buffer), eq(chunkSize * i + progress))).andReturn(bytes);
-                ioHandler.write(eq("destination"), aryEq(buffer), eq(progress), eq(bytes));
+                expect(IIO.read(eqRAF(source), aryEq(buffer), eq(chunkSize * i + progress))).andReturn(bytes);
+                IIO.write(eqRAF(destination), aryEq(buffer), eq(progress), eq(bytes));
                 progress += bytes;
 
                 Pair<Long, Long> pair = new Pair<>(size, progress);
@@ -68,5 +83,10 @@ public class UTestIOProcessor extends EasyMockSupport {
         verifyAll();
 
         resetAll();
+    }
+
+    public static RandomAccessFile eqRAF(RandomAccessFile in) {
+        EasyMock.reportMatcher(new RandomAccessFileEquals(in));
+        return null;
     }
 }

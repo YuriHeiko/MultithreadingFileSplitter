@@ -1,11 +1,15 @@
 package com.sysgears.service.processor;
 
-import com.sysgears.io.IOHandler;
+import com.sysgears.io.IIO;
 import com.sysgears.io.IOHandlerException;
+import com.sysgears.service.ServiceException;
 import com.sysgears.service.processor.processable.IProcessable;
 import com.sysgears.statistic.IHolder;
 import javafx.util.Pair;
 import org.apache.log4j.Logger;
+
+import java.io.IOException;
+import java.io.RandomAccessFile;
 
 /**
  * Processes the {@code IProcessable} object
@@ -14,7 +18,7 @@ public class IOProcessor implements IProcessableProcessor {
     /**
      * The {@code IOHandler} instance
      */
-    private final IOHandler io;
+    private final IIO io;
     /**
      * The {@code IHolder} instance
      */
@@ -35,7 +39,7 @@ public class IOProcessor implements IProcessableProcessor {
      * @param holder     The {@code IHolder} instance
      * @param bufferSize The buffer size
      */
-    public IOProcessor(final IOHandler io, final IHolder<Long, Pair<Long, Long>> holder, final int bufferSize) {
+    public IOProcessor(final IIO io, final IHolder<Long, Pair<Long, Long>> holder, final int bufferSize) {
         this.io = io;
         this.holder = holder;
         this.bufferSize = bufferSize;
@@ -50,34 +54,43 @@ public class IOProcessor implements IProcessableProcessor {
      */
     @Override
     public boolean process(final IProcessable processable) {
-        final long size = processable.getSize();
-        final byte[] buffer = new byte[bufferSize > size ? (int) size : bufferSize];
-        final String source = processable.getSource();
-        final long sourceOffset = processable.getSourceOffset();
-        final String destination = processable.getDestination();
-        final long destinationOffset = processable.getDestinationOffset();
-        int bytes = 0;
-        long progress = 0;
+        log.debug("Trying to open the source and destination files");
+        try (final RandomAccessFile source = new RandomAccessFile(processable.getSource(), "r");
+             final RandomAccessFile destination = new RandomAccessFile(processable.getDestination(), "rw")) {
 
-        while (progress < size) {
-            try {
-                bytes = io.read(source, buffer, sourceOffset + progress);
-                log.debug("Read from source offset: " + (sourceOffset + progress) + " bytes: " + bytes);
-            } catch (IOHandlerException e) {
-                log.error("Error during reading, source: " + processable.toString());
-            }
-            try {
-                io.write(destination, buffer, destinationOffset + progress, bytes);
-                log.debug("Written to destination offset: " +
-                            (destinationOffset + progress) + " bytes: " + bytes);
-            } catch (IOHandlerException e) {
-                log.error("Error during writing, destination: " + processable.toString());
-            }
-            progress += bytes;
+            final long size = processable.getSize();
+            final byte[] buffer = new byte[bufferSize > size ? (int) size : bufferSize];
+            final long sourceOffset = processable.getSourceOffset();
+            final long destinationOffset = processable.getDestinationOffset();
+            long progress = 0;
 
-            log.debug("Changing the statistic record");
-            holder.add(Thread.currentThread().getId(), new Pair<>(size, progress));
+            while (progress < size) {
+                int bytes;
+                try {
+                    bytes = io.read(source, buffer, sourceOffset + progress);
+                    log.debug("Read from source offset: " + (sourceOffset + progress) + " bytes: " + bytes);
+                } catch (IOHandlerException e) {
+                    log.error("IO error during reading, source: " + processable.toString());
+                    throw new ServiceException("IO error during reading, source: " + processable.toString());
+                }
+                try {
+                    io.write(destination, buffer, destinationOffset + progress, bytes);
+                    log.debug("Written to destination offset: " + (destinationOffset + progress) + " bytes: " + bytes);
+                } catch (IOHandlerException e) {
+                    log.error("Error during writing, destination: " + processable.toString());
+                    throw new ServiceException("IO error during writing, destination: " + processable.toString());
+                }
+                progress += bytes;
+
+                log.debug("Changing the statistic record");
+                holder.add(Thread.currentThread().getId(), new Pair<>(size, progress));
+            }
+        } catch (IOException e) {
+            log.error("IO error during opening the destination file: " + processable.getDestination());
+            throw new ServiceException("IO error during opening the source or destination files. Source: " +
+                                        processable.getSource() + " | Destination: " + processable.getDestination());
         }
+
         log.info("finished processing" + processable.toString());
 
         return true;
