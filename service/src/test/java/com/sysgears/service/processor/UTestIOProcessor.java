@@ -9,6 +9,7 @@ import org.easymock.EasyMockSupport;
 import org.easymock.Mock;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.io.RandomAccessFile;
 
 import static org.easymock.EasyMock.*;
@@ -82,10 +83,20 @@ public class UTestIOProcessor extends EasyMockSupport {
         verifyAll();
 
         resetAll();
+        clean();
     }
 
-    public static RandomAccessFile eqRAF(RandomAccessFile in) {
+    private static RandomAccessFile eqRAF(RandomAccessFile in) {
         EasyMock.reportMatcher(new RandomAccessFileEquals(in));
         return null;
     }
+
+    private void clean() {
+        for (File file : new File(path).listFiles()) {
+            if (file.isFile()) {
+                file.delete();
+            }
+        }
+    }
+
 }

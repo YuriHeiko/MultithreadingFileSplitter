@@ -40,13 +40,12 @@ public class FileChunk implements IProcessable {
      * @param size              The size of the source
      * @param sourceOffset      The source offset
      * @param destinationOffset The destination offset
-     * @throws ServiceException if an IO exception is occurred
      */
     public FileChunk(final String source,
                      final String destination,
                      final long size,
                      final long sourceOffset,
-                     final long destinationOffset) throws ServiceException {
+                     final long destinationOffset) {
         this.size = size;
         this.sourceOffset = sourceOffset;
         this.destinationOffset = destinationOffset;

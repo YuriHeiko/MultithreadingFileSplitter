@@ -44,11 +44,6 @@ public class CommandSplit implements IExecutable {
     @Parameter(names = "-t", description = "Number of threads")
     private int threadsNumber = FileProcessor.THREADS_NUMBER;
     /**
-     * The first part number
-     */
-    @Parameter(names = "-f", description = "First part number")
-    private int startNumber = FileProcessor.START_NUMBER;
-    /**
      * The statistic output delay
      */
     @Parameter(names = "-d", description = "Statistic output delay(ms)")
@@ -63,6 +58,10 @@ public class CommandSplit implements IExecutable {
      */
     @Parameter(names = "-b", description = "IO buffer size(bytes) (The max size: " + FileProcessor.MAX_BUFFER_SIZE + ")")
     private int bufferSize = FileProcessor.BUFFER_SIZE;
+    /**
+     * The first part number
+     */
+    private int startNumber = FileProcessor.START_NUMBER;
     /**
      * The string representation of byte contractions
      */
@@ -165,7 +164,7 @@ public class CommandSplit implements IExecutable {
      * @param stringSize The string with byte constraints
      * @return The number
      */
-    private long convertToNumber(final String stringSize) {
+    long convertToNumber(final String stringSize) {
         long chunkSize;
 
         log.debug("Trying to convert size from string to number format");
