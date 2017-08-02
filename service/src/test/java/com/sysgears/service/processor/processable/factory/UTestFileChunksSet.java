@@ -10,7 +10,6 @@ import org.testng.annotations.Test;
 import java.util.NoSuchElementException;
 
 import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.expectThrows;
 
 @Test(suiteName = "Service", testName = "FileChunkSetTest")
 public class UTestFileChunksSet extends EasyMockSupport {

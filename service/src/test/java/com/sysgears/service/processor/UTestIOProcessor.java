@@ -1,7 +1,6 @@
 package com.sysgears.service.processor;
 
 import com.sysgears.io.IIO;
-import com.sysgears.service.RandomAccessFileEquals;
 import com.sysgears.service.processor.processable.IProcessable;
 import com.sysgears.statistic.IHolder;
 import javafx.util.Pair;

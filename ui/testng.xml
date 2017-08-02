@@ -4,38 +4,10 @@
     <suite name="Service">
         <test name="InitTest">
             <classes>
-                <class name="com.sysgears.service.processor.processable.factory"/>
+                <class name="com.sysgears.ui.ITestCommandSplit"/>
             </classes>
             <packages>
-                <package name="com.sysgears.example.user"/>
-            </packages>
-        </test>
-        <test name="userTest">
-            <!-- Initializing test's groups-->
-            <groups>
-                <run>
-                    <include name="addUser"/>
-                </run>
-            </groups>
-            <classes>
-                <class name="com.sysgears.example.user.ITestUserUpdater"/>
-            </classes>
-            <packages>
-                <package name="com.sysgears.example.user"/>
-            </packages>
-        </test>
-        <test name="itemTest">
-            <!-- Initializing test's groups-->
-            <groups>
-                <run>
-                    <include name="itemTests"/>
-                </run>
-            </groups>
-            <classes>
-                <class name="com.sysgears.example.user.ITestItemUpdater"/>
-            </classes>
-            <packages>
-                <package name="com.sysgears.example.user"/>
+                <package name="com.sysgears.ui"/>
             </packages>
         </test>
     </suite>
