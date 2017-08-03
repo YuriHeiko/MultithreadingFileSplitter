@@ -68,7 +68,8 @@ public class ServiceRunner {
                 try {
                     String s = response.get();
                     if (!s.isEmpty()) {
-                        System.out.println("An error has occurred during operations: " + s);
+                        log.error("An error has occurred during operations: " + s);
+                        throw new UIException("An error has occurred during operations: " + s);
                     }
                 } catch (ExecutionException e) {
                     viewerThread.interrupt();
@@ -76,6 +77,8 @@ public class ServiceRunner {
                     throw new UIException("A some thread work has been canceled: " + e.getMessage());
                 }
             }
+
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             log.error("Service shutting down awaiting has been suddenly interrupted: " + e.getMessage());
             throw new UIException("Service shutting down awaiting has been suddenly interrupted. Work has been halted: " + e.getMessage());
