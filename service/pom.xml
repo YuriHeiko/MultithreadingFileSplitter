@@ -63,11 +63,9 @@
                         </goals>
                         <configuration>
                             <skip>false</skip>
-<!--
                             <includes>
-                                <include>**/*.java</include>
+                                <include>**/IT*.java</include>
                             </includes>
--->
                             <suiteXmlFiles>
                                 <suiteXmlFile>testngIT.xml</suiteXmlFile>
                             </suiteXmlFiles>

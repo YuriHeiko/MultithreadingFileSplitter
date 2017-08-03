@@ -63,7 +63,7 @@ public class UTestIOProcessor extends EasyMockSupport {
             Pair<Long, Long> prev = null;
             while (progress < size) {
                 int bytes = expBufferSize > size - progress ? (int) (size - progress) : expBufferSize;
-                byte[] buffer = new byte[expBufferSize];
+                byte[] buffer = new byte[bytes];
                 expect(IIO.read(eqRAF(source), aryEq(buffer), eq(chunkSize * i + progress))).andReturn(bytes);
                 IIO.write(eqRAF(destination), aryEq(buffer), eq(progress), eq(bytes));
                 progress += bytes;

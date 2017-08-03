@@ -59,14 +59,17 @@ public class IOProcessor implements IProcessableProcessor {
              final RandomAccessFile destination = new RandomAccessFile(processable.getDestination(), "rw")) {
 
             final long size = processable.getSize();
-            final byte[] buffer = new byte[bufferSize > size ? (int) size : bufferSize];
             final long sourceOffset = processable.getSourceOffset();
             final long destinationOffset = processable.getDestinationOffset();
+            byte[] buffer = new byte[bufferSize > size ? (int) size : bufferSize];
             long progress = 0;
 
             while (progress < size) {
                 int bytes;
                 try {
+                    if (buffer.length > size - progress) {
+                        buffer = new byte[(int) (size - progress)];
+                    }
                     bytes = io.read(source, buffer, sourceOffset + progress);
                     log.debug("Read from source offset: " + (sourceOffset + progress) + " bytes: " + bytes);
                 } catch (IOHandlerException e) {

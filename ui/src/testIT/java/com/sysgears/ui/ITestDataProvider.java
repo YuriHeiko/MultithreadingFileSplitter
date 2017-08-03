@@ -19,7 +19,8 @@ public class ITestDataProvider {
 */
         return new Object[][]{
                 new Object[]{10, 1, 1, 1000, ".part", 1024, 26, 8},
-                new Object[]{15, 2, 1, 1000, ".part", 1024, 260, 80}
+                new Object[]{15, 2, 1, 1000, ".part", 1024, 260, 80},
+                new Object[]{15000, 1, 1, 100, ".t", 1024, 260000, 8000}
         };
     }
 
@@ -36,7 +37,8 @@ public class ITestDataProvider {
 */
         return new Object[][]{
                 new Object[]{10, 1, 1000, ".part", 1024, 26, 8},
-                new Object[]{15, 2, 1000, ".part", 1024, 260, 80}
+                new Object[]{15, 2, 1000, ".part", 1024, 260, 80},
+                new Object[]{15000, 4, 100, ".p", 1024, 260000, 80000}
         };
     }
 }
